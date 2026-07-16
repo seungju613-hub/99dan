@@ -474,7 +474,8 @@ function genByType(type){
     default: a=ri(1,8);b=ri(1,9-a);op='+';
   }
   ans = op==='−' ? a-b : a+b;
-  if(ans<0){ return genByType(type); } // 안전장치
+  // 의미 없는 문제 제거: 0을 더하거나(±0), 답이 0이 되는 경우 다시 생성
+  if(ans<0 || a===0 || b===0 || ans===0){ return genByType(type); }
   return {a,b,op,ans,text:`${a} ${op} ${b}`};
 }
 
