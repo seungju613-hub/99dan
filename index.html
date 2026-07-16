@@ -6,8 +6,8 @@
 
 <!-- ===== 검색/공유용 정보 (SEO · Open Graph) ===== -->
 <title>수호엄마의 playground · 초등 학습 게임 모음</title>
-<meta name="description" content="구구단·덧셈뺄셈·한자·영어까지, 초등학생이 재미있게 배우는 무료 학습 게임 모음. 폰과 컴퓨터에서 바로 즐기세요. 수호엄마가 직접 만듭니다.">
-<meta name="keywords" content="구구단 게임, 초등학생 학습게임, 구구단 연습, 곱셈 게임, 무료 교육 게임, 초등 수학 게임, 한자 게임, 영어 게임, 덧셈 뺄셈">
+<meta name="description" content="구구단·덧셈뺄셈까지, 초등학생이 재미있게 배우는 무료 학습 게임 모음. 슬라임을 키우며 계산을 연습해요. 폰과 컴퓨터에서 바로 즐기세요. 수호엄마가 직접 만듭니다.">
+<meta name="keywords" content="구구단 게임, 초등학생 학습게임, 구구단 연습, 곱셈 게임, 무료 교육 게임, 초등 수학 게임, 덧셈 뺄셈 게임, 슬라임 키우기, 초등 덧셈뺄셈">
 <meta name="author" content="수호엄마">
 <link rel="canonical" href="https://example.github.io/playground/">
 <meta name="robots" content="index, follow">
@@ -42,27 +42,29 @@
 <style>
 :root{
   /* 놀이터 블록 팔레트 — 따뜻한 종이 + 블록 원색 */
-  --paper:#FFF6E9; --paper2:#FFEFD8;
-  --ink:#3B3226; --dim:#8C7B63;
+  --paper:#FFF3CE; --paper2:#FFEAAF;
+  --ink:#4A3D24; --dim:#9A8355;
   --tomato:#FF6B57; --sunny:#FFC542; --grass:#3FB27F; --sky:#4AA8E0; --grape:#9B7BE0;
-  --card:#FFFFFF; --line:#F0E2CC;
-  --shadow:0 4px 0 rgba(120,90,50,.14);
-  --shadow-lg:0 14px 34px rgba(150,110,60,.18);
+  --card:#FFFFFF; --line:#F3E4BE;
+  --shadow:0 4px 0 rgba(150,110,40,.13);
+  --shadow-lg:0 14px 34px rgba(170,130,40,.18);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{margin:0;color:var(--ink);font-family:'Pretendard','Nunito','Noto Sans KR',system-ui,sans-serif;
   background:
-    radial-gradient(60% 40% at 12% 0%, rgba(255,197,66,.20), transparent 55%),
-    radial-gradient(55% 40% at 100% 8%, rgba(74,168,224,.16), transparent 55%),
-    var(--paper);
+    radial-gradient(58% 42% at 8% 0%, rgba(255,206,74,.42), transparent 58%),
+    radial-gradient(52% 40% at 100% 4%, rgba(255,168,104,.22), transparent 56%),
+    radial-gradient(46% 36% at 92% 100%, rgba(255,224,120,.30), transparent 60%),
+    linear-gradient(165deg, #FFF7D6 0%, #FFEEB8 52%, #FFF4CC 100%);
+  background-attachment:fixed;
   line-height:1.6;-webkit-font-smoothing:antialiased}
 .wrap{max-width:960px;margin:0 auto;padding:0 20px}
 a{color:inherit;text-decoration:none}
 .disp{font-family:'Baloo 2','Baloo 2',cursive,sans-serif}
 
 /* ===== 상단 바 ===== */
-header{position:sticky;top:0;z-index:20;background:rgba(255,246,233,.9);backdrop-filter:blur(8px);
+header{position:sticky;top:0;z-index:20;background:rgba(255,243,206,.92);backdrop-filter:blur(8px);
   border-bottom:2px solid var(--line)}
 .bar{display:flex;align-items:center;gap:10px;height:60px}
 .logo{display:flex;align-items:center;gap:9px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:19px}
@@ -116,6 +118,17 @@ h1.big em::after{content:'';position:absolute;left:-2%;right:-2%;bottom:6%;heigh
 .block.soon .go{background:var(--dim);cursor:default}
 .block.soon:hover{transform:none}
 
+/* ===== 공유(링크 복사) ===== */
+.share{margin:22px 0 6px;background:linear-gradient(180deg,#FFFDF4,var(--card));border:2px solid var(--line);
+  border-radius:22px;padding:22px 24px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:center;
+  justify-content:center;flex-wrap:wrap;text-align:center}
+.share .share-txt{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;color:var(--ink)}
+.share-btn{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:#fff;background:var(--sky);
+  border:none;border-radius:14px;padding:11px 22px;cursor:pointer;box-shadow:0 4px 0 rgba(40,120,180,.5);
+  display:inline-flex;align-items:center;gap:7px;transition:transform .1s ease, background .2s ease}
+.share-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(40,120,180,.5)}
+.share-btn.done{background:var(--grass);box-shadow:0 4px 0 rgba(40,150,100,.5)}
+
 /* ===== 소개 배너 ===== */
 .about{margin:34px 0 8px;background:linear-gradient(180deg,var(--card),var(--paper2));border:2px solid var(--line);
   border-radius:24px;padding:26px 24px;box-shadow:var(--shadow);display:flex;gap:20px;align-items:center;flex-wrap:wrap}
@@ -164,13 +177,12 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
   <section class="hero">
     <div class="wrap">
       <div class="hi"><span class="dot"></span> 무료 · 폰과 컴퓨터에서 바로 플레이</div>
-      <h1 class="big">배우는 게 <em>놀이</em>가 되는<br><span class="play">수호엄마의 playground</span></h1>
-      <p class="sub">구구단부터 시작해요. 아이가 스스로 도전하고, 틀려도 다시 일어서는
-      작은 학습 게임들을 하나씩 모아갑니다.</p>
+      <h1 class="big">게임으로 <em>학습</em>까지!</h1>
+      <p class="sub">엄마 아빠도 같이 도전해보세요.<br>함께 할 때 더 재밌답니다 :)</p>
       <div class="tools">
         <span class="chip">🧮 <b>수학</b></span>
-        <span class="chip">🈷️ <b>한자</b></span>
-        <span class="chip">🔤 <b>영어</b></span>
+        <span class="chip">💣 <b>구구단</b></span>
+        <span class="chip">👾 <b>슬라임 키우기</b></span>
         <span class="chip">📱 <b>폰·컴 모두</b></span>
       </div>
     </div>
@@ -180,8 +192,8 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
   <section class="section" id="games">
     <div class="wrap">
       <div class="sec-head">
-        <h2>🎮 놀이 블록</h2>
-        <span>블록을 눌러 게임을 시작해요</span>
+        <h2>📚 1·2학년 수준</h2>
+        <span>게임을 눌러 시작해요</span>
       </div>
       <div class="grid">
 
@@ -194,33 +206,34 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
           <span class="go">▶ 시작하기</span>
         </a>
 
-        <!-- 덧셈뺄셈 (준비중) -->
-        <div class="block c-add soon">
+        <!-- 슬라임 키우기 (준비 완료) -->
+        <a class="block c-add ready" href="slime.html">
           <span class="tag">수학</span>
-          <span class="face">➕</span>
-          <h3>덧셈·뺄셈 대모험</h3>
-          <p>더하고 빼며 나아가는 신나는 계산 모험. 곧 만나요!</p>
-          <span class="go">🔧 준비중</span>
-        </div>
+          <span class="face">👾</span>
+          <h3>슬라임 키우기</h3>
+          <p>덧셈·뺄셈을 풀어 슬라임에게 밥 주고 돌봐요. 알에서 어른까지 10단계로 쑥쑥!</p>
+          <span class="go">▶ 시작하기</span>
+        </a>
 
-        <!-- 한자 (준비중) -->
+        <!-- 커밍순 메시지 -->
         <div class="block c-han soon">
-          <span class="tag">한자</span>
-          <span class="face">🈷️</span>
-          <h3>한자 탐험대</h3>
-          <p>그림처럼 익히는 재미있는 한자 배우기. 곧 만나요!</p>
+          <span class="tag">준비중</span>
+          <span class="face">✨</span>
+          <h3>커밍순</h3>
+          <p>새로운 놀이 블록을 만들고 있어요.<br>곧 만나요!</p>
           <span class="go">🔧 준비중</span>
         </div>
 
-        <!-- 영어 (준비중) -->
-        <div class="block c-eng soon">
-          <span class="tag">영어</span>
-          <span class="face">🔤</span>
-          <h3>영어 낱말 놀이</h3>
-          <p>듣고 맞히며 익히는 기초 영어 단어. 곧 만나요!</p>
-          <span class="go">🔧 준비중</span>
-        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- 공유 -->
+  <section class="section" id="share">
+    <div class="wrap">
+      <div class="share">
+        <span class="share-txt">마음에 들면 친구·이웃에게 공유해 주세요 💛</span>
+        <button class="share-btn" id="copyBtn" type="button">🔗 링크 복사</button>
       </div>
     </div>
   </section>
@@ -232,9 +245,11 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
         <div class="ava">👩</div>
         <div class="txt">
           <h3>안녕하세요, 수호엄마예요</h3>
-          <p>우리 아이가 즐겁게 공부했으면 하는 마음으로 게임을 하나씩 직접 만들고 있어요.
+          <p>이 사이트의 게임은 무료 소스와 AI(클로드)를 이용해 만들고 있습니다.
+          아이와 함께 즐겁게 공부하고 싶은 마음으로 만들었어요.
           아이 친구들, 이웃 부모님들, 그리고 어디선가 이 페이지를 찾은 누군가에게도
-          도움이 되면 좋겠습니다. 설치 없이 링크만 열면 바로 시작할 수 있어요.</p>
+          도움이 되면 좋겠습니다. 이미지 소스에 문제가 있을 시,
+          <a href="mailto:seungju613@gmail.com" style="color:var(--sky);font-weight:800">메일로 연락</a> 주세요.</p>
         </div>
       </div>
     </div>
@@ -251,6 +266,34 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
     </div>
   </div>
 </footer>
+
+<script>
+(function(){
+  var btn=document.getElementById('copyBtn');
+  if(!btn) return;
+  var label='🔗 링크 복사';
+  btn.addEventListener('click',function(){
+    var url=window.location.href;
+    function ok(){
+      btn.textContent='✅ 복사됐어요!'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent=label; btn.classList.remove('done'); },1800);
+    }
+    function fallback(){
+      try{
+        var t=document.createElement('textarea'); t.value=url;
+        t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t);
+        t.focus(); t.select(); document.execCommand('copy'); document.body.removeChild(t); ok();
+      }catch(e){
+        btn.textContent='주소: '+url;
+        setTimeout(function(){ btn.textContent=label; },3000);
+      }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(ok).catch(fallback);
+    } else { fallback(); }
+  });
+})();
+</script>
 
 </body>
 </html>
