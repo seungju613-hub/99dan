@@ -142,6 +142,7 @@ body{font-family:'Pretendard','Nunito',system-ui,sans-serif;color:var(--ink);ove
   font-family:'Baloo 2',sans-serif;font-weight:800;font-size:34px;color:var(--grape);background:#FBF3FF;cursor:pointer;transition:.12s}
 .qbox.filled{border-style:solid}
 .qbox.active{border-style:solid;border-color:var(--grape);box-shadow:0 0 0 3px rgba(181,139,232,.28);transform:translateY(-2px)}
+.qbox.whole{min-width:96px;width:auto;padding:0 16px;letter-spacing:4px}
 .qplace{font-size:10px;color:var(--dim);font-weight:800;margin-top:3px}
 .qmsg{min-height:22px;font-weight:800;font-size:14px;color:var(--peach);margin:8px 0 2px}
 .qmsg.hide{display:none}
@@ -379,7 +380,9 @@ const STEPS=[
   {name:'슬기 슬라임',  stageName:'슬기 슬라임',quota:40, gen:'subB2',  lvl:'받아내림 두 자리'},
 ];
 const MAX_STEP=STEPS.length; // 10 → 완주하면 엔딩
-const VERTICAL_FROM_STEP=5;  // 이 단계부터 세로셈/가로셈 랜덤 (두 자리 ± 두 자리)
+// 단자리 계산(답을 통으로 외우는 유형)은 '통(단일 칸)·가로'로, 그 외는 전부 '세로셈·일의자리 먼저'로
+const WHOLE_TYPES=['add1','sub1','ten','addC1'];   // 4+6=10, 7+8=15 처럼 통으로 외우는 계산
+const isVerticalType=(gen)=>!WHOLE_TYPES.includes(gen);
 
 /* ================= 상태 ================= */
 const SAVE_KEY='slime-raise-v2';
@@ -586,7 +589,7 @@ function tintBackground(){
 }
 
 /* ================= 돌봄 → 퀴즈 ================= */
-let boxes=[], activeIdx=0;
+let boxes=[], activeIdx=0, wholeMode=false, lastQ=null;
 let quizTimer=null, quizDeadline=0, quizDuration=0, padLocked=false;
 
 function startCare(kind){
@@ -601,12 +604,21 @@ function startCare(kind){
 // 새 문제 생성 + 칸 초기화 + 타이머 시작
 // 새 문제: 이미 맞힌 문제는 피하고, 세로/가로 결정
 function keyOf(q){ return q.a+q.op+q.b; }
+// 직전 문제와 '비슷한지' — 답이 같거나, 두 수의 일의 자리가 둘 다 같으면(35-7 vs 25-7) 비슷함
+function similarQ(q,l){
+  if(!l) return false;
+  if(q.ans===l.ans) return true;
+  if((q.a%10)===(l.a%10) && (q.b%10)===(l.b%10)) return true;
+  return false;
+}
 function makeProblem(){
   const type=STEPS[S.step-1].gen;
   if(!S.solved) S.solved=[];
   let q, tries=0;
-  do{ q=genByType(type); tries++; } while(S.solved.includes(keyOf(q)) && tries<80);
-  q.vertical = (S.step>=VERTICAL_FROM_STEP) ? (Math.random()<0.5) : false;
+  do{ q=genByType(type); tries++; }
+  while( (S.solved.includes(keyOf(q)) || similarQ(q,lastQ)) && tries<150);
+  q.vertical = isVerticalType(type);   // 단자리 계산=가로 통 / 그 외=항상 세로셈
+  lastQ=q;
   return q;
 }
 function newProblem(){
@@ -615,14 +627,18 @@ function newProblem(){
   resetBoxes();
   startQuizTimer();
 }
-/* ---- 자릿수 칸 ---- */
+/* ---- 입력 칸 (통 단일칸 / 세로 자릿수칸) ---- */
 function resetBoxes(){
-  const n=String(quiz.ans).length;      // 답의 자릿수만큼 칸
-  boxes=Array(n).fill('');
-  activeIdx = n>1 ? n-1 : 0;            // 두 자리↑는 일의 자리(맨 오른쪽)부터
+  wholeMode = !quiz.vertical;          // 단자리 계산 = 통(단일칸), 그 외 = 세로 자릿수칸
+  if(wholeMode){
+    boxes=['']; activeIdx=0;
+  } else {
+    const n=String(quiz.ans).length;
+    boxes=Array(n).fill(''); activeIdx = n>1 ? n-1 : 0;   // 세로는 일의 자리(맨 오른쪽)부터
+  }
   paintQuiz();
 }
-// 가로/세로 두 모드를 한 번에 그림
+// 가로 통 / 세로셈 렌더
 function paintQuiz(){
   const body=$('#qBody'); if(!body) return;
   if(quiz.vertical){
@@ -639,13 +655,13 @@ function paintQuiz(){
       <div class="vrow"><span class="vd vsign"></span>${lead(w-boxes.length)}${bx}</div>
     </div>`;
   } else {
-    const labels=boxes.length===2?['십','일']:boxes.length===3?['백','십','일']:[''];
-    const bx=boxes.map((d,i)=>`<span style="display:inline-flex;flex-direction:column;align-items:center"><span class="qbox${i===activeIdx?' active':''}${d?' filled':''}" data-i="${i}">${d||''}</span>${boxes.length>1?`<span class="qplace">${labels[i]||''}</span>`:''}</span>`).join('');
-    body.innerHTML=`<span class="qtext">${quiz.text}</span> = <span class="qboxes">${bx}</span>`;
+    // 통(단일칸) — 답을 통째로 입력
+    const val=boxes[0]||'';
+    body.innerHTML=`<span class="qtext">${quiz.text}</span> = <span class="qboxes"><span class="qbox whole active${val?' filled':''}" data-i="0">${val}</span></span>`;
   }
   body.querySelectorAll('.qbox').forEach(b=>b.addEventListener('click',()=>{ if(padLocked)return; activeIdx=+b.dataset.i; paintQuiz(); }));
 }
-// 가까운 빈 칸으로 이동 (두 자리면 일↔십 자동 교차)
+// 가까운 빈 칸으로 이동 (세로에서 일↔십 자동 교차)
 function nextEmpty(from){
   if(boxes.every(v=>v!=='')) return from;
   let best=from, bestDist=99;
@@ -654,18 +670,28 @@ function nextEmpty(from){
 }
 function qInput(d){
   if(padLocked) return;
+  if(wholeMode){
+    if(boxes[0].length>=2) return;     // 통은 최대 두 자리
+    boxes[0]+=d; sType(); paintQuiz(); return;
+  }
   boxes[activeIdx]=d; sType();
-  activeIdx=nextEmpty(activeIdx);        // 남은 빈 칸으로 자동 이동
+  activeIdx=nextEmpty(activeIdx);       // 남은 빈 칸으로 자동 이동
   paintQuiz();
 }
 function qDel(){
   if(padLocked) return;
+  if(wholeMode){ boxes[0]=boxes[0].slice(0,-1); paintQuiz(); return; }
   if(boxes[activeIdx]!=='') boxes[activeIdx]='';
   else if(activeIdx>0){ activeIdx--; boxes[activeIdx]=''; }
   paintQuiz();
 }
-const boxesFull=()=>boxes.every(d=>d!=='');
-const boxesValue=()=>parseInt(boxes.join(''),10);
+function clearInput(){                   // 같은 문제 재도전 시 입력만 비움
+  if(wholeMode){ boxes=['']; activeIdx=0; }
+  else { boxes=boxes.map(()=>''); activeIdx=boxes.length>1?boxes.length-1:0; }
+  paintQuiz();
+}
+const boxesFull=()=> wholeMode ? boxes[0]!=='' : boxes.every(d=>d!=='');
+const boxesValue=()=> wholeMode ? parseInt(boxes[0],10) : parseInt(boxes.join(''),10);
 
 /* ---- 시간 제한 ---- */
 function startQuizTimer(){
@@ -690,8 +716,8 @@ function updateQuizTimer(){
 function stopQuizTimer(){ clearInterval(quizTimer); $('#qCount').textContent=''; }
 function onTimeUp(){
   sBad(); lockPad(true);
-  showQMsg(`⏰ 시간이 다 됐어! 정답은 ${quiz.ans}. 다른 문제를 풀어보자!`);
-  setTimeout(()=>{ newProblem(); }, 1500);
+  showQMsg('시간이 다 됐어! 새 문제를 풀어보자 :)');
+  setTimeout(()=>{ newProblem(); }, 1400);
 }
 function lockPad(v){ padLocked=v; $('#qpad').classList.toggle('locked',v); }
 function showQMsg(t){ const m=$('#qMsg'); m.textContent=t; m.classList.remove('hide'); }
@@ -715,9 +741,9 @@ function qSubmit(){
   } else {
     fb.textContent='❌'; fb.classList.remove('show'); void fb.offsetWidth; fb.classList.add('show'); sBad();
     lockPad(true);
-    showQMsg(`아쉬워! 정답은 ${quiz.ans}야. 한 번 더 눌러서 익혀보자 😊`);
-    // 같은 문제 유지 → 정답을 보고 다시 입력 (재도전, solved에 넣지 않음)
-    setTimeout(()=>{ boxes=boxes.map(()=>''); activeIdx=boxes.length>1?boxes.length-1:0; paintQuiz(); clearQMsg(); lockPad(false); startQuizTimer(); }, 1600);
+    showQMsg('앗, 정답이 아니야! 다시 한번 풀어보자 :)');
+    // 정답을 알려주지 않고 같은 문제를 끝까지 맞추도록 (solved에 넣지 않음)
+    setTimeout(()=>{ clearInput(); clearQMsg(); lockPad(false); startQuizTimer(); }, 1300);
   }
 }
 function doCare(kind){
