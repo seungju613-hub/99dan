@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>속담 맞추기 · 속담마법왕 되기 · 수호엄마의 playground</title>
+<meta name="description" content="그림을 보고 속담 빈칸을 맞혀 금화를 모으고, 아이템 10개를 모아 속담마법왕이 되어보세요! 초등 속담 학습 게임.">
+<meta property="og:title" content="속담 맞추기 · 속담마법왕 되기">
+<meta property="og:description" content="속담을 맞혀 금화를 모으고 속담마법왕 아이템을 모아요!">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧙</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{--ink:#4A3D24;--dim:#9A8355;--card:#fff;--line:#F3E4BE;--pink:#FF6B9D;--yellow:#FFC542;--gold:#FFB300;--mint:#3FB27F;--sky:#4AA8E0;--grape:#8A5CE0;--tomato:#FF6B57;--shadow:0 4px 0 rgba(150,110,40,.16);--shadow-lg:0 16px 36px rgba(150,90,180,.22)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:'Pretendard',system-ui,sans-serif;color:var(--ink);line-height:1.6;overflow-x:hidden;
+ background:radial-gradient(60% 40% at 8% 0%,rgba(255,206,74,.5),transparent 58%),radial-gradient(50% 40% at 95% 8%,rgba(138,92,224,.22),transparent 60%),radial-gradient(46% 40% at 92% 100%,rgba(255,140,180,.28),transparent 62%),linear-gradient(165deg,#FFF7D6,#FFEBC0 50%,#FFF0D8);background-attachment:fixed;min-height:100vh}
+.disp{font-family:'Baloo 2',cursive,sans-serif}
+.wrap{max-width:660px;margin:0 auto;padding:12px 14px 40px}
+header{text-align:center;padding:10px 0 2px}
+.brand{font-size:12.5px;font-weight:800;color:var(--dim)}
+h1{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(24px,6vw,34px);margin:2px 0}
+h1 .hl{color:var(--grape)}
+.card{background:var(--card);border:3px solid #fff;border-radius:26px;box-shadow:var(--shadow-lg);padding:18px;margin-top:12px;position:relative;overflow:hidden}
+.hidden{display:none!important}
+.btn{font-family:'Baloo 2',sans-serif;font-weight:800;border:none;border-radius:16px;padding:14px 26px;font-size:18px;cursor:pointer;box-shadow:var(--shadow);transition:transform .08s}
+.btn:active{transform:translateY(2px)}
+.btn.go{background:linear-gradient(180deg,#FF8A5C,#FF6B57);color:#fff}
+.btn.next{background:linear-gradient(180deg,#54c98f,#3FB27F);color:#fff;width:100%;margin-top:14px}
+.btn.grape{background:linear-gradient(180deg,#9E74F0,#8A5CE0);color:#fff}
+
+/* 인트로 */
+#intro{text-align:center}
+#intro .king{width:150px;height:auto;margin:0 auto;display:block;filter:drop-shadow(0 10px 12px rgba(140,90,200,.28))}
+#intro h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:23px;margin:6px 0 4px;color:var(--grape)}
+#intro .msg{background:#F7F1FF;border:2px dashed #D9C7F5;border-radius:16px;padding:14px 16px;font-weight:700;font-size:14px;color:#6B4BA8;margin:12px 0}
+.namebox{display:flex;gap:8px;align-items:center;justify-content:center;margin:14px 0 4px;flex-wrap:wrap}
+.namebox .lab{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:18px;color:var(--ink)}
+#nameIn{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:18px;text-align:center;border:3px solid var(--line);border-radius:14px;padding:10px 14px;width:150px;color:var(--grape);background:#FFFDF7}
+#nameIn:focus{outline:none;border-color:var(--grape)}
+
+/* HUD */
+.hud{display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,#FFF9EC,#fff);border:2px solid var(--line);border-radius:20px;padding:10px 12px;margin-bottom:12px}
+.hud .avatar{width:78px;height:88px;flex:0 0 auto}
+.hud .avatar svg{width:100%;height:100%;overflow:visible}
+.hud .info{flex:1;min-width:0}
+.hud .king-name{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:var(--grape);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud .coins{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--gold);display:flex;align-items:center;gap:4px}
+.hud .items-bar{display:flex;gap:3px;margin-top:5px}
+.hud .slot{width:100%;height:9px;border-radius:99px;background:#EFE2C2;flex:1}
+.hud .slot.on{background:linear-gradient(90deg,#FFD35A,#FFB300)}
+.hud .next-txt{font-size:11px;font-weight:800;color:var(--dim);margin-top:4px}
+#quitBtn{flex:0 0 auto;background:#fff;border:2px solid var(--line);border-radius:12px;font-weight:800;font-size:12px;color:var(--dim);padding:6px 10px;cursor:pointer}
+
+.avatar.bounce svg{animation:bounce .6s ease}
+@keyframes bounce{0%,100%{transform:translateY(0)}30%{transform:translateY(-12px) scale(1.05)}60%{transform:translateY(0) scale(.98)}}
+
+/* 그림 */
+.scene{width:100%;aspect-ratio:1024/572;object-fit:cover;border-radius:18px;border:3px solid #fff;box-shadow:0 6px 16px rgba(150,110,40,.16);background:#f6ecd0;display:block}
+.sent{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(20px,5.5vw,27px);text-align:center;margin:16px 0 6px;line-height:1.9;word-break:keep-all}
+.slot2{display:inline-block;min-width:104px;text-align:center;padding:2px 14px;color:var(--grape);border-bottom:5px dashed var(--grape);margin:0 3px;border-radius:4px}
+.slot2.empty{background:#F5EFFF}
+.slot2.filled{border-bottom-style:solid}
+.slot2.ok{color:var(--mint);border-bottom-color:var(--mint)}
+.slot2.no{color:var(--tomato);border-bottom-color:var(--tomato)}
+.blank-label{font-weight:800;font-size:12.5px;color:var(--dim);text-align:center;margin:12px 0 4px}
+.opts{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.opt{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:17px;background:#fff;border:3px solid var(--line);border-radius:15px;padding:12px 20px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow);transition:transform .08s}
+.opt:active{transform:translateY(2px)}
+.opt.sel{border-color:var(--grape);background:#F5EFFF;color:var(--grape)}
+.opt.correct{border-color:var(--mint);background:#E7F7EF;color:var(--mint)}
+.opt.wrong{border-color:var(--tomato);background:#FFF0ED;color:var(--tomato)}
+.opt[disabled]{cursor:default}
+
+/* 공개 */
+.reveal{margin-top:14px;border-radius:18px;padding:16px;border:3px solid var(--line);background:linear-gradient(180deg,#FFFDF4,#fff);display:none}
+.reveal.show{display:block;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.reveal .res{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;text-align:center;margin-bottom:8px}
+.reveal .res.o{color:var(--mint)} .reveal .res.x{color:var(--tomato)}
+.reveal .full{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:19px;text-align:center;color:var(--ink);margin-bottom:12px}
+.reveal .line{font-size:14.5px;font-weight:700;margin:6px 0;display:flex;gap:8px;align-items:flex-start}
+.reveal .line .k{flex:0 0 auto;color:#fff;background:var(--sky);border-radius:8px;padding:2px 10px;font-size:12px;font-family:'Baloo 2',sans-serif}
+/* 사자성어 크게 */
+.reveal .idiom-box{margin-top:12px;background:#F5EFFF;border:2px solid #E0D2F7;border-radius:14px;padding:12px;text-align:center}
+.reveal .idiom-box .k2{font-size:12px;font-weight:800;color:var(--grape)}
+.reveal .idiom-box .val{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(22px,6vw,30px);color:var(--grape);margin-top:2px;letter-spacing:1px}
+
+/* 아이템 획득 오버레이 */
+.overlay{position:fixed;inset:0;background:rgba(60,40,90,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.overlay.show{display:flex;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.pop-card{background:#fff;border-radius:26px;padding:26px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 20px 50px rgba(80,40,120,.4);animation:popin .4s cubic-bezier(.2,1.3,.4,1)}
+@keyframes popin{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.pop-card .ttl{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--gold)}
+.pop-card .itemimg{width:130px;height:145px;margin:8px auto 4px}
+.pop-card .itemimg svg{width:100%;height:100%;overflow:visible}
+.pop-card .nm{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:24px;color:var(--grape);margin:2px 0 4px}
+.pop-card .sub{font-weight:700;font-size:13px;color:var(--dim);margin-bottom:14px}
+
+/* 피날레 */
+#finale{text-align:center;display:none}
+#finale .crown{font-size:44px}
+#finale .bigav{width:230px;height:auto;margin:6px auto;filter:drop-shadow(0 14px 16px rgba(140,90,200,.3))}
+#finale .title{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:26px;color:var(--grape);margin:4px 0}
+#finale .cong{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--gold);margin:2px 0 6px}
+#finale .cap-hint{font-weight:700;font-size:13px;color:var(--dim);background:#FFF7E4;border:2px dashed var(--line);border-radius:12px;padding:8px 12px;margin:10px 0}
+
+/* fx */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.confetti{position:absolute;width:11px;height:11px;border-radius:2px;will-change:transform,opacity}
+.coinfly{position:absolute;font-size:26px;will-change:transform,opacity;z-index:61}
+.plusfly{position:absolute;display:flex;align-items:center;gap:4px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:var(--gold);z-index:61;text-shadow:0 2px 0 #fff}
+
+footer{text-align:center;margin-top:16px;color:var(--dim);font-weight:700;font-size:11.5px;line-height:1.7}
+footer a{color:var(--dim)}
+</style>
+</head>
+<body>
+<div id="fx"></div>
+<div class="wrap">
+  <header>
+    <div class="brand">📚 수호엄마의 playground</div>
+    <h1>속담 <span class="hl">맞추기</span></h1>
+  </header>
+
+  <!-- 인트로 -->
+  <div class="card" id="intro">
+    <div class="king" id="introKing"></div>
+    <h2>속담마법왕이 되어보자!</h2>
+    <div class="msg">속담마법왕이 되기 위한 <b>아이템을 모두 모아봐!</b><br>총 <b>10가지 아이템</b>이 있어. 문제를 풀면서 <b>금화</b>가 나오고,<br>금화가 <b>10개 이상</b>일 때마다 <b>아이템이 등장</b>해! ✨</div>
+    <div class="namebox">
+      <span class="lab">속담마법왕</span>
+      <input id="nameIn" maxlength="6" placeholder="이름" autocomplete="off">
+    </div>
+    <button class="btn go" id="startBtn" style="margin-top:12px">모험 시작! ✨</button>
+  </div>
+
+  <!-- 게임 -->
+  <div class="card hidden" id="game">
+    <div class="hud">
+      <div class="avatar" id="hudAvatar"></div>
+      <div class="info">
+        <div class="king-name" id="hudName">속담마법왕</div>
+        <div class="coins"><svg viewBox="0 0 24 24" width="22" height="22" style="vertical-align:-0.2em"><circle cx="12" cy="12" r="10" fill="#FFCF5A" stroke="#E0A93A" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#E6B84A" stroke-width="1.5"/><ellipse cx="9" cy="8.5" rx="2.6" ry="1.7" fill="#FFF0C0" opacity=".85"/></svg> <span id="coinNum">0</span></div>
+        <div class="items-bar" id="itemsBar"></div>
+        <div class="next-txt" id="nextTxt"></div>
+      </div>
+      <button id="quitBtn">그만</button>
+    </div>
+
+    <img class="scene" id="scene" alt="속담 그림">
+    <div class="sent" id="sent"></div>
+    <div id="optArea"></div>
+    <button class="btn next hidden" id="submitBtn">확인!</button>
+
+    <div class="reveal" id="reveal">
+      <div class="res" id="res"></div>
+      <div class="full" id="full"></div>
+      <div class="line"><span class="k">뜻</span><span id="mean"></span></div>
+      <div class="idiom-box" id="idiomBox"><div class="k2">비슷한 사자성어</div><div class="val" id="idiom"></div></div>
+      <button class="btn next" id="nextBtn">다음 문제 →</button>
+    </div>
+  </div>
+
+  <!-- 아이템 획득 오버레이 -->
+  <div class="overlay" id="itemOverlay">
+    <div class="pop-card">
+      <div class="ttl">🎉 새 아이템 획득!</div>
+      <div class="itemimg" id="popItemImg"></div>
+      <div class="nm" id="popItemName"></div>
+      <div class="sub" id="popItemCount"></div>
+      <button class="btn grape" id="popOkBtn" style="width:100%">좋아! 👍</button>
+    </div>
+  </div>
+
+  <!-- 피날레 -->
+  <div class="card" id="finale">
+    <div class="crown">👑</div>
+    <div class="bigav" id="finaleAvatar"></div>
+    <div class="title" id="finaleTitle">속담마법왕</div>
+    <div class="cong">🎉 축하해! 아이템 10개를 모두 모았어! 🎉</div>
+    <div class="cap-hint">📸 이 화면을 캡처해서 자랑해봐!</div>
+    <button class="btn go" id="againBtn" style="margin-top:6px">다시 하기</button>
+  </div>
+
+  <footer>
+    만든이 · 수호엄마 · <a href="mailto:seungju613@gmail.com">seungju613@gmail.com</a><br>
+    무료 소스와 AI로 제작 · 그림 출처 문제 시 메일로 연락 주세요
+  </footer>
+</div>
+
+<script>
+const IMGDIR='sokdam-img/';
+const DATA=[{"img": "01", "tpl": "{0} 날자 {1} 떨어진다", "full": "까마귀 날자 배 떨어진다", "blanks": [{"a": "까마귀", "o": ["까마귀", "까치", "참새"]}, {"a": "배", "o": ["배", "사과", "감"]}], "mean": "우연히 함께 일어난 일 때문에 괜히 의심을 받음", "idiom": "오비이락(烏飛梨落)"}, {"img": "02", "tpl": "{0} 잃고 {1} 고친다", "full": "소 잃고 외양간 고친다", "blanks": [{"a": "소", "o": ["소", "말", "돼지"]}, {"a": "외양간", "o": ["외양간", "마구간", "울타리"]}], "mean": "일이 이미 잘못된 뒤에야 뒤늦게 손을 씀", "idiom": "망양보뢰(亡羊補牢)"}, {"img": "03", "tpl": "{0} 안 {1}", "full": "우물 안 개구리", "blanks": [{"a": "우물", "o": ["우물", "연못", "샘"]}, {"a": "개구리", "o": ["개구리", "두꺼비", "올챙이"]}], "mean": "넓은 세상을 모르고 자기가 아는 좁은 곳만 앎", "idiom": "정저지와(井底之蛙)"}, {"img": "04", "tpl": "{0} 밑이 어둡다", "full": "등잔 밑이 어둡다", "blanks": [{"a": "등잔", "o": ["등잔", "촛불", "전등"]}], "mean": "가까이 있는 것을 오히려 잘 알지 못함", "idiom": "등하불명(燈下不明)"}, {"img": "05", "tpl": "{0}도 {1}부터", "full": "천 리 길도 한 걸음부터", "blanks": [{"a": "천 리 길", "o": ["천 리 길", "지름길", "오솔길"]}, {"a": "한 걸음", "o": ["한 걸음", "두 걸음", "뜀박질"]}], "mean": "아무리 큰 일도 작은 시작에서 비롯됨", "idiom": "등고자비(登高自卑)"}, {"img": "06", "tpl": "{0} {1} 먹기", "full": "누워서 떡 먹기", "blanks": [{"a": "누워서", "o": ["누워서", "앉아서", "서서"]}, {"a": "떡", "o": ["떡", "밥", "빵"]}], "mean": "매우 하기 쉬운 일", "idiom": "이여반장(易如反掌)"}, {"img": "07", "tpl": "{0} 싸움에 {1} 등 터진다", "full": "고래 싸움에 새우 등 터진다", "blanks": [{"a": "고래", "o": ["고래", "상어", "돌고래"]}, {"a": "새우", "o": ["새우", "게", "조개"]}], "mean": "강한 자들끼리 다투는 통에 약한 자가 피해를 봄", "idiom": "경전하사(鯨戰蝦死)"}, {"img": "08", "tpl": "{0} 가는 데 {1} 간다", "full": "바늘 가는 데 실 간다", "blanks": [{"a": "바늘", "o": ["바늘", "못", "핀"]}, {"a": "실", "o": ["실", "끈", "줄"]}], "mean": "서로 늘 붙어 다니는 아주 가까운 사이", "idiom": ""}, {"img": "09", "tpl": "{0}도 나무에서 떨어진다", "full": "원숭이도 나무에서 떨어진다", "blanks": [{"a": "원숭이", "o": ["원숭이", "다람쥐", "너구리"]}], "mean": "아무리 잘하는 사람도 가끔 실수할 때가 있음", "idiom": ""}, {"img": "10", "tpl": "{0}도 제 말 하면 온다", "full": "호랑이도 제 말 하면 온다", "blanks": [{"a": "호랑이", "o": ["호랑이", "사자", "표범"]}], "mean": "마침 이야기하고 있는데 그 사람이 나타남", "idiom": "담호호지(談虎虎至)"}, {"img": "11", "tpl": "갈수록 {0}", "full": "갈수록 태산", "blanks": [{"a": "태산", "o": ["태산", "언덕", "바다"]}], "mean": "갈수록 더 힘들고 어려워짐", "idiom": "설상가상(雪上加霜)"}, {"img": "12", "tpl": "{0}는 {1} 편", "full": "가재는 게 편", "blanks": [{"a": "가재", "o": ["가재", "개구리", "물고기"]}, {"a": "게", "o": ["게", "새우", "조개"]}], "mean": "비슷한 처지끼리 서로 편을 듦", "idiom": "초록동색(草綠同色)"}, {"img": "13", "tpl": "{0} {1} 적 생각 못 한다", "full": "개구리 올챙이 적 생각 못 한다", "blanks": [{"a": "개구리", "o": ["개구리", "두꺼비", "거북이"]}, {"a": "올챙이", "o": ["올챙이", "병아리", "애벌레"]}], "mean": "잘된 뒤 어렵던 시절을 잊고 잘난 체함", "idiom": ""}, {"img": "14", "tpl": "{0} 대신 {1}", "full": "꿩 대신 닭", "blanks": [{"a": "꿩", "o": ["꿩", "오리", "참새"]}, {"a": "닭", "o": ["닭", "거위", "비둘기"]}], "mean": "꼭 맞는 것이 없을 때 비슷한 것으로 대신함", "idiom": ""}, {"img": "15", "tpl": "{0} 놓고 기역 자도 모른다", "full": "낫 놓고 기역 자도 모른다", "blanks": [{"a": "낫", "o": ["낫", "호미", "삽"]}], "mean": "아주 쉬운 것도 모를 만큼 무식함", "idiom": "목불식정(目不識丁)"}, {"img": "16", "tpl": "남의 {0}이 더 커 보인다", "full": "남의 떡이 더 커 보인다", "blanks": [{"a": "떡", "o": ["떡", "빵", "밥"]}], "mean": "남의 것이 자기 것보다 더 좋아 보임", "idiom": ""}, {"img": "17", "tpl": "내 {0}가 석 자", "full": "내 코가 석 자", "blanks": [{"a": "코", "o": ["코", "귀", "손"]}], "mean": "내 사정이 급해 남을 도울 처지가 못 됨", "idiom": "오비삼척(吾鼻三尺)"}, {"img": "18", "tpl": "누워서 {0} 뱉기", "full": "누워서 침 뱉기", "blanks": [{"a": "침", "o": ["침", "물", "돌"]}], "mean": "남을 해치려다 도리어 자기가 해를 입음", "idiom": "자업자득(自業自得)"}, {"img": "19", "tpl": "다 된 {0}에 {1} 뿌리기", "full": "다 된 밥에 재 뿌리기", "blanks": [{"a": "밥", "o": ["밥", "국", "떡"]}, {"a": "재", "o": ["재", "물", "소금"]}], "mean": "거의 다 된 일을 마지막에 망침", "idiom": ""}, {"img": "20", "tpl": "{0} 잡아먹고 {1} 내민다", "full": "닭 잡아먹고 오리발 내민다", "blanks": [{"a": "닭", "o": ["닭", "오리", "토끼"]}, {"a": "오리발", "o": ["오리발", "닭발", "손"]}], "mean": "잘못을 저지르고 엉뚱한 것으로 속이려 함", "idiom": ""}, {"img": "21", "tpl": "{0} 키 재기", "full": "도토리 키 재기", "blanks": [{"a": "도토리", "o": ["도토리", "밤", "콩"]}], "mean": "비슷한 것끼리 서로 낫다고 다툼", "idiom": "대동소이(大同小異)"}, {"img": "22", "tpl": "{0}도 두들겨 보고 건너라", "full": "돌다리도 두들겨 보고 건너라", "blanks": [{"a": "돌다리", "o": ["돌다리", "나무다리", "징검다리"]}], "mean": "잘 아는 일도 조심하고 또 조심하라", "idiom": "심사숙고(深思熟考)"}, {"img": "23", "tpl": "{0}로 주고 {1}로 받는다", "full": "되로 주고 말로 받는다", "blanks": [{"a": "되", "o": ["되", "잔", "숟가락"]}, {"a": "말", "o": ["말", "항아리", "바구니"]}], "mean": "조금 주고 훨씬 크게 돌려받음", "idiom": ""}, {"img": "24", "tpl": "{0} 놈 위에 {1} 놈 있다", "full": "뛰는 놈 위에 나는 놈 있다", "blanks": [{"a": "뛰는", "o": ["뛰는", "걷는", "자는"]}, {"a": "나는", "o": ["나는", "기는", "눕는"]}], "mean": "아무리 잘해도 더 뛰어난 사람이 있음", "idiom": ""}, {"img": "25", "tpl": "마른하늘에 {0}", "full": "마른하늘에 날벼락", "blanks": [{"a": "날벼락", "o": ["날벼락", "소나기", "눈보라"]}], "mean": "뜻밖에 갑자기 닥친 재앙", "idiom": "청천벽력(靑天霹靂)"}, {"img": "26", "tpl": "목마른 놈이 {0} 판다", "full": "목마른 놈이 우물 판다", "blanks": [{"a": "우물", "o": ["우물", "연못", "도랑"]}], "mean": "급하고 아쉬운 사람이 먼저 나서서 일함", "idiom": "갈이천정(渴而穿井)"}, {"img": "27", "tpl": "못 먹는 {0} 찔러나 본다", "full": "못 먹는 감 찔러나 본다", "blanks": [{"a": "감", "o": ["감", "배", "사과"]}], "mean": "자기가 못 가질 바엔 심술이라도 부림", "idiom": ""}, {"img": "28", "tpl": "밑 빠진 {0}에 {1} 붓기", "full": "밑 빠진 독에 물 붓기", "blanks": [{"a": "독", "o": ["독", "항아리", "바가지"]}, {"a": "물", "o": ["물", "쌀", "모래"]}], "mean": "아무리 애써도 보람이 없음", "idiom": "노이무공(勞而無功)"}, {"img": "29", "tpl": "{0} 도둑이 {1}도둑 된다", "full": "바늘 도둑이 소도둑 된다", "blanks": [{"a": "바늘", "o": ["바늘", "실", "못"]}, {"a": "소", "o": ["소", "말", "돼지"]}], "mean": "작은 나쁜 버릇이 자라 큰 죄가 됨", "idiom": ""}, {"img": "30", "tpl": "{0}보다 {1}이 더 크다", "full": "배보다 배꼽이 더 크다", "blanks": [{"a": "배", "o": ["배", "등", "가슴"]}, {"a": "배꼽", "o": ["배꼽", "단추", "점"]}], "mean": "정작 중요한 것보다 딸린 것이 더 큼", "idiom": "주객전도(主客顚倒)"}, {"img": "31", "tpl": "{0}는 익을수록 고개를 숙인다", "full": "벼는 익을수록 고개를 숙인다", "blanks": [{"a": "벼", "o": ["벼", "보리", "밀"]}], "mean": "훌륭한 사람일수록 겸손함", "idiom": "겸양지덕(謙讓之德)"}, {"img": "32", "tpl": "{0} 주고 {1} 준다", "full": "병 주고 약 준다", "blanks": [{"a": "병", "o": ["병", "벌", "숙제"]}, {"a": "약", "o": ["약", "밥", "돈"]}], "mean": "해를 끼치고 나서 도와주는 척함", "idiom": ""}, {"img": "33", "tpl": "빈 {0}가 요란하다", "full": "빈 수레가 요란하다", "blanks": [{"a": "수레", "o": ["수레", "항아리", "가마"]}], "mean": "잘 모르는 사람이 더 시끄럽게 떠듦", "idiom": "허장성세(虛張聲勢)"}];
+const $=s=>document.querySelector(s);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+/* ---------- 아바타 SVG ---------- */
+const ITEMS=[
+ {key:'cape',name:'멋진 망토'},{key:'hat',name:'마법 모자'},{key:'book1',name:'책 1권'},
+ {key:'book2',name:'책 2권'},{key:'pencil',name:'연필'},{key:'case',name:'필통'},
+ {key:'wand',name:'마법 지팡이'},{key:'necklace',name:'목걸이'},{key:'bag',name:'책가방'},{key:'frog',name:'개구리 친구'}
+];
+const PIECE={
+ cape:'<path d="M118 150 Q86 244 94 302 L160 286 L226 302 Q234 244 202 150 Z" fill="#E5535B" stroke="#B23A48" stroke-width="4"/><path d="M120 150 Q160 176 200 150 L192 132 Q160 154 128 132 Z" fill="#F2707A"/>',
+ bagBack:'<ellipse cx="250" cy="250" rx="24" ry="34" fill="#E67E22" stroke="#B8621A" stroke-width="4"/>',
+ bagStraps:'<rect x="120" y="166" width="16" height="96" rx="8" fill="#E67E22" stroke="#B8621A" stroke-width="3"/><rect x="184" y="166" width="16" height="96" rx="8" fill="#E67E22" stroke="#B8621A" stroke-width="3"/><rect x="120" y="210" width="80" height="14" rx="7" fill="#F2994A"/>',
+ necklace:'<path d="M116 250 Q160 278 204 250" fill="none" stroke="#FFCF5A" stroke-width="5"/><path d="M160 268 l10 12 -10 12 -10 -12 z" fill="#56C6E0" stroke="#2E9CB8" stroke-width="2"/>',
+ book1:'<g transform="translate(52,214) rotate(-8)"><rect x="0" y="0" width="46" height="34" rx="4" fill="#4AA8E0" stroke="#2E7BB0" stroke-width="3"/><rect x="6" y="4" width="34" height="26" rx="2" fill="#EAF4FC"/><line x1="23" y1="4" x2="23" y2="30" stroke="#B9D9F0" stroke-width="2"/></g>',
+ wand:'<line x1="238" y1="258" x2="266" y2="200" stroke="#8A5A2B" stroke-width="7" stroke-linecap="round"/><path d="M270 190 l4 9 10 1 -7 7 2 10 -9 -5 -9 5 2 -10 -7 -7 10 -1 z" fill="#FFE08A" stroke="#E0A93A" stroke-width="1.5"/>',
+ face:'<ellipse cx="136" cy="196" rx="19" ry="23" fill="#fff" stroke="#5A4A7A" stroke-width="3"/><ellipse cx="184" cy="196" rx="19" ry="23" fill="#fff" stroke="#5A4A7A" stroke-width="3"/><circle cx="140" cy="201" r="10" fill="#3A2E52"/><circle cx="180" cy="201" r="10" fill="#3A2E52"/><circle cx="137" cy="196" r="4" fill="#fff"/><circle cx="177" cy="196" r="4" fill="#fff"/><ellipse cx="110" cy="224" rx="13" ry="8" fill="#FF9EC0" opacity=".8"/><ellipse cx="210" cy="224" rx="13" ry="8" fill="#FF9EC0" opacity=".8"/><path d="M146 230 Q160 244 174 230" fill="none" stroke="#5A4A7A" stroke-width="4" stroke-linecap="round"/>',
+ hat:'<ellipse cx="160" cy="150" rx="72" ry="16" fill="#6D4FB0" stroke="#4A3486" stroke-width="3"/><path d="M116 150 L204 150 L168 52 Q160 40 152 52 Z" fill="#7C5FCF" stroke="#4A3486" stroke-width="3"/><rect x="120" y="140" width="80" height="16" rx="8" fill="#FFCF5A"/><path d="M160 34 l4 9 10 1 -7 7 2 10 -9 -5 -9 5 2 -10 -7 -7 10 -1 z" fill="#FFE08A" stroke="#E0A93A" stroke-width="1.5"/>',
+ book2:'<g class="flt"><g transform="translate(40,92) rotate(-10)"><rect x="0" y="8" width="42" height="12" rx="2" fill="#FF8FB0" stroke="#D96A8E" stroke-width="2"/><rect x="3" y="-2" width="42" height="12" rx="2" fill="#5FD8B4" stroke="#33A886" stroke-width="2"/></g></g>',
+ pencil:'<g class="flt"><g transform="translate(246,96) rotate(35)"><rect x="0" y="0" width="14" height="56" rx="3" fill="#FFC542" stroke="#D99E1A" stroke-width="2"/><path d="M0 56 L14 56 L7 70 Z" fill="#F2C79A" stroke="#C99A5A" stroke-width="2"/><path d="M2 66 L12 66 L7 74 Z" fill="#4A3E2A"/><rect x="0" y="-2" width="14" height="8" rx="2" fill="#FF8FB0"/></g></g>',
+ case:'<g class="flt"><g transform="translate(250,182)"><rect x="0" y="0" width="52" height="26" rx="12" fill="#9B7BE0" stroke="#6D4FB0" stroke-width="3"/><line x1="6" y1="10" x2="46" y2="10" stroke="#C9B4F0" stroke-width="3"/><circle cx="44" cy="10" r="3" fill="#FFCF5A"/></g></g>',
+ frog:'<g transform="translate(224,286)"><ellipse cx="16" cy="20" rx="20" ry="15" fill="#7CC86A" stroke="#4E9440" stroke-width="3"/><circle cx="6" cy="6" r="8" fill="#7CC86A" stroke="#4E9440" stroke-width="3"/><circle cx="26" cy="6" r="8" fill="#7CC86A" stroke="#4E9440" stroke-width="3"/><circle cx="6" cy="5" r="3" fill="#2A3A22"/><circle cx="26" cy="5" r="3" fill="#2A3A22"/><path d="M8 24 Q16 30 24 24" fill="none" stroke="#3A6E30" stroke-width="2.5" stroke-linecap="round"/></g>'
+};
+function avatarSVG(eq){
+  const h=k=>eq.includes(k);
+  return '<svg viewBox="0 0 320 360" xmlns="http://www.w3.org/2000/svg">'
+   +'<ellipse cx="160" cy="322" rx="80" ry="16" fill="rgba(90,60,120,.18)"/>'
+   +(h('cape')?PIECE.cape:'')
+   +(h('bag')?PIECE.bagBack:'')
+   +'<ellipse cx="160" cy="210" rx="92" ry="96" fill="#B79BEA" stroke="#5A4A7A" stroke-width="5"/>'
+   +'<ellipse cx="160" cy="232" rx="60" ry="56" fill="#C9B4F0"/>'
+   +'<ellipse cx="130" cy="298" rx="20" ry="12" fill="#A487DB" stroke="#5A4A7A" stroke-width="4"/><ellipse cx="190" cy="298" rx="20" ry="12" fill="#A487DB" stroke="#5A4A7A" stroke-width="4"/>'
+   +'<ellipse cx="80" cy="234" rx="20" ry="26" fill="#B79BEA" stroke="#5A4A7A" stroke-width="4"/><ellipse cx="240" cy="234" rx="20" ry="26" fill="#B79BEA" stroke="#5A4A7A" stroke-width="4"/>'
+   +(h('bag')?PIECE.bagStraps:'')
+   +(h('necklace')?PIECE.necklace:'')
+   +(h('book1')?PIECE.book1:'')
+   +(h('wand')?PIECE.wand:'')
+   +PIECE.face
+   +(h('hat')?PIECE.hat:'')
+   +(h('book2')?PIECE.book2:'')
+   +(h('pencil')?PIECE.pencil:'')
+   +(h('case')?PIECE.case:'')
+   +(h('frog')?PIECE.frog:'')
+   +'</svg>';
+}
+function itemMiniSVG(key){
+  // 아이템 단독 미리보기(획득 오버레이용): 아바타 그리되 해당 아이템만 부각 어려우니, 기본 아바타+그 아이템만 착용
+  return avatarSVG([key]);
+}
+
+/* ---------- 상태 ---------- */
+const COIN='<svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="10" fill="#FFCF5A" stroke="#E0A93A" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#E6B84A" stroke-width="1.5"/><ellipse cx="9" cy="8.5" rx="2.6" ry="1.7" fill="#FFF0C0" opacity=".85"/></svg>';
+let name='속담마법왕', queue=[], idx=0, coins=0, itemsEarned=0, cur=null, active=[], sel={}, answered=false;
+function equippedKeys(){ return ITEMS.slice(0,itemsEarned).map(i=>i.key); }
+
+/* ---------- 사운드 ---------- */
+let AC=null; function ac(){ if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}} return AC; }
+function tone(freqs,dur,type){ const c=ac(); if(!c)return; let t=c.currentTime; freqs.forEach(f=>{const o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.22,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur);t+=dur*0.85;}); }
+const sGood=()=>tone([660,880,1046],0.12), sBad=()=>tone([300,220],0.16), sTap=()=>tone([520],0.05), sCoin=()=>tone([1046,1318],0.08,'triangle'), sItem=()=>tone([660,880,1046,1318],0.14,'triangle');
+
+/* ---------- fx ---------- */
+const FX=$('#fx');
+function confetti(cx,cy){
+  const cols=['#FFC542','#FF6B9D','#3FB27F','#4AA8E0','#8A5CE0','#FF6B57'];
+  for(let i=0;i<28;i++){
+    const d=document.createElement('div'); d.className='confetti';
+    d.style.left=cx+'px'; d.style.top=cy+'px'; d.style.background=cols[i%cols.length];
+    FX.appendChild(d);
+    const ang=Math.random()*Math.PI*2, dist=80+Math.random()*160;
+    const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist - 60 + Math.random()*120;
+    if(d.animate){ d.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${dx}px,${dy+180}px) rotate(${360+Math.random()*360}deg)`,opacity:0}],{duration:1100+Math.random()*500,easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>d.remove(); }
+    else setTimeout(()=>d.remove(),1400);
+  }
+}
+function flyCoins(n, fromX, fromY){
+  const tgt=$('#coinNum').getBoundingClientRect(); const tx=tgt.left+tgt.width/2, ty=tgt.top+tgt.height/2;
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div'); c.className='coinfly'; c.innerHTML=COIN;
+    c.style.left=fromX+'px'; c.style.top=fromY+'px'; FX.appendChild(c);
+    const delay=i*160;
+    if(c.animate){ c.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0,offset:0},{transform:'translate(-50%,-50%) scale(1.3)',opacity:1,offset:.15},{transform:`translate(calc(${tx-fromX}px - 50%),calc(${ty-fromY}px - 50%)) scale(.7)`,opacity:1,offset:.9},{transform:`translate(calc(${tx-fromX}px - 50%),calc(${ty-fromY}px - 50%)) scale(.2)`,opacity:0}],{duration:900,delay,easing:'cubic-bezier(.4,.1,.3,1)',fill:'forwards'}).onfinish=()=>{c.remove(); sCoin();}; }
+    else setTimeout(()=>c.remove(),900+delay);
+  }
+}
+function plusFloat(n, x, y){
+  const p=document.createElement('div'); p.className='plusfly'; p.innerHTML='+'+n+' '+COIN;
+  p.style.left=x+'px'; p.style.top=y+'px'; FX.appendChild(p);
+  if(p.animate){ p.animate([{transform:'translate(-50%,0) scale(.6)',opacity:0},{transform:'translate(-50%,-14px) scale(1.1)',opacity:1,offset:.3},{transform:'translate(-50%,-46px) scale(1)',opacity:0}],{duration:1200,easing:'ease-out'}).onfinish=()=>p.remove(); }
+  else setTimeout(()=>p.remove(),1200);
+}
+
+/* ---------- HUD ---------- */
+function updateHUD(){
+  $('#hudAvatar').innerHTML=avatarSVG(equippedKeys());
+  $('#hudName').textContent='속담마법왕 '+name;
+  $('#coinNum').textContent=coins;
+  // 아이템 진행바 10칸
+  const bar=$('#itemsBar'); bar.innerHTML='';
+  for(let i=0;i<10;i++){ const s=document.createElement('div'); s.className='slot'+(i<itemsEarned?' on':''); bar.appendChild(s); }
+  const toNext=(itemsEarned<10)?((itemsEarned+1)*10 - coins):0;
+  $('#nextTxt').textContent = itemsEarned>=10 ? '아이템 10개 완성! 👑' : ('다음 아이템까지 금화 '+toNext+'개  ·  아이템 '+itemsEarned+'/10');
+}
+
+/* ---------- 흐름 ---------- */
+function start(){
+  const v=$('#nameIn').value.trim(); name=v||'꼬마';
+  coins=0; itemsEarned=0; queue=shuffle([...Array(DATA.length).keys()]); idx=0;
+  $('#intro').classList.add('hidden'); $('#finale').style.display='none'; $('#game').classList.remove('hidden');
+  updateHUD(); render();
+}
+function render(){
+  answered=false; sel={};
+  cur=DATA[queue[idx]];
+  if(cur.blanks.length===2){ const r=Math.random(); active = r<0.5 ? [0,1] : [ Math.random()<0.5?0:1 ]; }
+  else active=[0];
+  window.__cur=cur; window.__active=active;
+  $('#scene').src=IMGDIR+cur.img+'.jpg';
+  paintSentence(); paintOptions();
+  $('#reveal').classList.remove('show');
+  const sb=$('#submitBtn'); sb.classList.add('hidden'); sb.disabled=true; sb.onclick=submit;
+}
+function partsOf(){ return cur.tpl.split(/(\{\d\})/).filter(x=>x!==''); }
+function paintSentence(){
+  const html=partsOf().map(p=>{
+    const m=p.match(/^\{(\d)\}$/);
+    if(!m) return '<span>'+p+'</span>';
+    const bi=+m[1];
+    if(active.includes(bi)){
+      const v=sel[bi]; let cls='slot2'+(v?' filled':' empty');
+      if(answered){ cls='slot2 '+(sel[bi]===cur.blanks[bi].a?'ok':'no'); }
+      const inner = answered ? cur.blanks[bi].a : (v || '?');
+      return '<span class="'+cls+'">'+inner+'</span>';
+    }
+    return '<span>'+cur.blanks[bi].a+'</span>';
+  }).join(' ');
+  $('#sent').innerHTML=html;
+}
+function paintOptions(){
+  const area=$('#optArea'); area.innerHTML='';
+  active.forEach(bi=>{
+    const b=cur.blanks[bi];
+    if(active.length>1){ const lb=document.createElement('div'); lb.className='blank-label'; lb.textContent=(active.indexOf(bi)+1)+'번 빈칸'; area.appendChild(lb); }
+    const row=document.createElement('div'); row.className='opts';
+    shuffle(b.o).forEach(word=>{
+      const btn=document.createElement('button'); btn.className='opt'; btn.textContent=word;
+      btn.dataset.blank=bi; btn.dataset.word=word; btn.onclick=()=>pick(bi,word,row);
+      row.appendChild(btn);
+    });
+    area.appendChild(row);
+  });
+}
+function pick(bi,word,row){
+  if(answered) return; sTap(); sel[bi]=word;
+  row.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel', o.dataset.word===word));
+  paintSentence();
+  const done=active.every(i=>sel[i]!==undefined);
+  const sb=$('#submitBtn'); sb.classList.toggle('hidden',!done); sb.disabled=!done;
+}
+function submit(){
+  if(answered) return; answered=true;
+  const correct=active.every(i=>sel[i]===cur.blanks[i].a);
+  document.querySelectorAll('.opt').forEach(o=>{ o.disabled=true; const bi=+o.dataset.blank,w=o.dataset.word;
+    if(w===cur.blanks[bi].a) o.classList.add('correct'); else if(sel[bi]===w) o.classList.add('wrong'); o.classList.remove('sel'); });
+  paintSentence();
+  $('#submitBtn').classList.add('hidden');
+  $('#res').textContent=correct?'정답이에요! 🎉':'아쉬워요, 정답을 볼까요? 😊';
+  $('#res').className='res '+(correct?'o':'x');
+  $('#full').textContent='"'+cur.full+'"';
+  $('#mean').textContent=cur.mean;
+  if(cur.idiom){ $('#idiomBox').style.display='block'; $('#idiom').textContent=cur.idiom; } else $('#idiomBox').style.display='none';
+  $('#reveal').classList.add('show');
+  $('#nextBtn').onclick=next;
+  if(correct){
+    sGood();
+    const av=$('#hudAvatar'); av.classList.remove('bounce'); void av.offsetWidth; av.classList.add('bounce');
+    const sc=$('#scene').getBoundingClientRect();
+    confetti(sc.left+sc.width/2, sc.top+sc.height/2);
+    const gained=active.length;
+    plusFloat(gained, sc.left+sc.width/2, sc.top+sc.height/2);
+    flyCoins(gained, sc.left+sc.width/2, sc.top+sc.height/2);
+    coins+=gained;
+    setTimeout(()=>{ $('#coinNum').textContent=coins; checkItems(); }, 700);
+  } else { sBad(); }
+}
+function checkItems(){
+  const newEarned=Math.min(10, Math.floor(coins/10));
+  updateHUD();
+  const pending=[];
+  while(itemsEarned<newEarned){ pending.push(ITEMS[itemsEarned]); itemsEarned++; }
+  updateHUD();
+  if(pending.length){ showItemPops(pending,0); }
+}
+function showItemPops(list, i){
+  if(i>=list.length){ if(itemsEarned>=10) setTimeout(finale,300); return; }
+  const it=list[i];
+  $('#popItemImg').innerHTML=itemMiniSVG(it.key);
+  $('#popItemName').textContent=it.name;
+  $('#popItemCount').textContent='아이템 '+(ITEMS.indexOf(it)+1)+' / 10';
+  $('#itemOverlay').classList.add('show'); sItem();
+  const r=FX.getBoundingClientRect(); confetti(r.width/2, r.height*0.4);
+  $('#popOkBtn').onclick=()=>{ $('#itemOverlay').classList.remove('show'); showItemPops(list,i+1); };
+}
+function next(){
+  idx++;
+  if(idx>=queue.length){ queue=shuffle([...Array(DATA.length).keys()]); idx=0; }
+  render();
+  $('#game').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function finale(){
+  $('#game').classList.add('hidden'); $('#intro').classList.add('hidden');
+  $('#finaleAvatar').innerHTML=avatarSVG(equippedKeys());
+  $('#finaleTitle').textContent='속담마법왕 '+name;
+  $('#finale').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  let n=0; const iv=setInterval(()=>{ const r=FX.getBoundingClientRect(); confetti(Math.random()*r.width, -10); if(++n>6)clearInterval(iv); },400);
+}
+function quit(){
+  // 그만하기: 지금까지 아바타로 격려 화면
+  $('#game').classList.add('hidden');
+  $('#finaleAvatar').innerHTML=avatarSVG(equippedKeys());
+  $('#finaleTitle').textContent='속담마법왕 '+name;
+  $('#finale').querySelector('.cong').textContent = itemsEarned>=10 ? '🎉 아이템 10개 완성! 🎉' : ('지금까지 아이템 '+itemsEarned+'개를 모았어! 또 도전해봐 💪');
+  $('#finale').querySelector('.crown').textContent = itemsEarned>=10 ? '👑' : '⭐';
+  $('#finale').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+$('#startBtn').onclick=start;
+$('#nameIn').addEventListener('keydown',e=>{ if(e.key==='Enter') start(); });
+$('#againBtn').onclick=()=>{ $('#finale').style.display='none'; $('#intro').classList.remove('hidden'); };
+$('#quitBtn').onclick=quit;
+// 인트로 아바타(기본 모습)
+$('#introKing').innerHTML=avatarSVG([]);
+</script>
+</body>
+</html>
