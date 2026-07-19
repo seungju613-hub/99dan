@@ -209,7 +209,7 @@ function transition(fn){const f=document.getElementById('fade');f.classList.add(
 function setBG(id){document.getElementById(id).style.backgroundImage=`url(${BG}bg_intro.jpg)`;}
 document.getElementById('scTitle').style.backgroundImage=`url(${BG}bg_intro.jpg)`;
 ['scHero','scName','scGuide'].forEach(i=>document.getElementById(i).style.backgroundImage=`url(${BG}bg_sky.jpg)`);
-function scene(bg){const sc=document.getElementById('scene');document.getElementById('mapwrap').classList.remove('on');sc.classList.add('on');if(bg){sc.style.backgroundImage=`url(${BG}${bg}.jpg)`;if(bg.indexOf('hotel')>=0){sc.style.backgroundSize='175%';sc.style.backgroundPosition='30% 90%';}else{sc.style.backgroundSize='cover';sc.style.backgroundPosition='center';}}}
+function scene(bg){const sc=document.getElementById('scene');document.getElementById('mapwrap').classList.remove('on');sc.classList.add('on');if(bg){sc.style.backgroundImage=`url(${BG}${bg}.jpg)`;if(bg.indexOf('hotel')>=0){sc.style.backgroundSize='auto 165%';sc.style.backgroundPosition='28% 88%';}else{sc.style.backgroundSize='cover';sc.style.backgroundPosition='center';}}}
 function showMapRaw(){hidePic();hidePhotos();document.getElementById('scene').classList.remove('on');document.getElementById('heroImg').style.opacity='0';document.getElementById('mapwrap').classList.add('on');}
 function mapview(){target=null;showMapRaw();resetView();}
 function setHero(expr){const im=document.getElementById('heroImg');im.src=`characters/hero_${G.hero}_${expr||'happy'}.png`;im.style.opacity='1';}
