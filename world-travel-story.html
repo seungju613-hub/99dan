@@ -108,6 +108,19 @@
   #photos .pol .cap{text-align:center;font-size:13px;color:#3a2a66;font-weight:800;margin-top:5px}
   #photos .pol .cr{position:absolute;right:6px;bottom:4px;font-size:8px;color:#b8b8b8}
   #fade{position:fixed;inset:0;z-index:40;background:#fff;opacity:0;pointer-events:none;transition:opacity .26s ease}#fade.on{opacity:1;pointer-events:auto}
+  .qpanel.rv{max-width:440px;width:94%;max-height:88vh;display:flex;flex-direction:column}
+  .rvtitle{font-size:clamp(20px,5vw,26px);font-weight:800;color:#8A5CE0;margin-bottom:6px}
+  .rvscore{font-size:15px;color:#3a2a66;font-weight:700;line-height:1.6;margin-bottom:10px}
+  .rvscore b{color:#E0632B;font-size:19px}
+  .rvgrade{display:inline-block;margin-top:4px;background:#FFEFD6;color:#C98A2E;border-radius:999px;padding:3px 14px;font-weight:800;font-size:15px}
+  .rvlist{flex:1;overflow-y:auto;text-align:left;margin:4px 0 12px;border-top:2px dashed #eadfc2;border-bottom:2px dashed #eadfc2;padding:8px 2px}
+  .rvrow{display:flex;align-items:center;gap:9px;padding:6px 4px;border-bottom:1px solid #f0f0f5}
+  .rvrow:last-child{border-bottom:none}
+  .rvno{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:#FF5E5E;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .rvrow img{width:38px;height:26px;object-fit:contain;background:#fff;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .rvtxt{display:flex;flex-direction:column;line-height:1.25}.rvtxt b{font-size:15px;color:#2b2350}.rvtxt span{font-size:12px;color:#7a7a95}
+  .rvempty{color:#9a9ab8;text-align:center;padding:16px}
+  .rvbtn{align-self:center;margin-top:2px}
   .endmsg{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-size:clamp(18px,4vw,26px);font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.45);padding:20px}
 </style></head>
 <body>
@@ -209,7 +222,7 @@ function transition(fn){const f=document.getElementById('fade');f.classList.add(
 function setBG(id){document.getElementById(id).style.backgroundImage=`url(${BG}bg_intro.jpg)`;}
 document.getElementById('scTitle').style.backgroundImage=`url(${BG}bg_intro.jpg)`;
 ['scHero','scName','scGuide'].forEach(i=>document.getElementById(i).style.backgroundImage=`url(${BG}bg_sky.jpg)`);
-function scene(bg){const sc=document.getElementById('scene');document.getElementById('mapwrap').classList.remove('on');sc.classList.add('on');if(bg){sc.style.backgroundImage=`url(${BG}${bg}.jpg)`;if(bg.indexOf('hotel')>=0){sc.style.backgroundSize='auto 165%';sc.style.backgroundPosition='28% 88%';}else{sc.style.backgroundSize='cover';sc.style.backgroundPosition='center';}}}
+function scene(bg){const sc=document.getElementById('scene');document.getElementById('mapwrap').classList.remove('on');sc.classList.add('on');if(bg){sc.style.backgroundImage=`url(${BG}${bg}.jpg)`;if(bg.indexOf('hotel')>=0){sc.style.backgroundSize='auto 130%';sc.style.backgroundPosition='30% 78%';}else{sc.style.backgroundSize='cover';sc.style.backgroundPosition='center';}}}
 function showMapRaw(){hidePic();hidePhotos();document.getElementById('scene').classList.remove('on');document.getElementById('heroImg').style.opacity='0';document.getElementById('mapwrap').classList.add('on');}
 function mapview(){target=null;showMapRaw();resetView();}
 function setHero(expr){const im=document.getElementById('heroImg');im.src=`characters/hero_${G.hero}_${expr||'happy'}.png`;im.style.opacity='1';}
@@ -392,7 +405,7 @@ function offer2nd(){
     choices:[{label:'한 번 더 잔다 🛏️',go:()=>doSleep(afterNight2)},{label:'이제 떠날래 ✈️',go:leaveHotel}]}]);}
 function cardAllowed(){return G.cardPlays<3;}
 function afterNight2(){if(cardAllowed())run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 이제 국기 기억력 게임을 해볼까? 같은 국기 짝을 찾는 거야! 🎴'}],memGame);else run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 체력도 든든하게 채웠어 😊'}],leaveHotel);}
-const MEM_PREVIEW=3000, MEM_TIME=60;  // 미리보기 3초, 제한 60초(초등 기준·추후 조정)
+const MEM_PREVIEW=3000, MEM_TIME=40;  // 미리보기 3초, 제한 60초(초등 기준·추후 조정)
 function memGame(){G.phase='quiz';document.getElementById('dbar').classList.remove('on');scene('bg_minigame');document.getElementById('heroImg').style.opacity='0';
   const pool=shuffle(DATA.roster.filter(r=>r.iso!=='kr')).slice(0,8);
   const deck=shuffle(pool.concat(pool));
@@ -426,11 +439,17 @@ function budgetGuard(next){
   if(G.money<=200){run([{who:'guide',expr:'explain',text:`앗, 돈이 ${G.money}만원밖에 안 남았어! 이제 아주 가까운 나라만 갈 수 있어. 예를 들면 ${sug} 같은 곳이야. 잘 골라야 해!`}],next);return;}
   if(G.money<=500){run([{who:'guide',expr:'explain',text:`슬슬 돈을 아껴야 해. 가까운 나라나 물가가 싼 나라를 고르면 더 오래 여행할 수 있어. 예를 들면 ${sug} 어때?`}],next);return;}
   next&&next();}
-function gameOver(){G.phase='over';document.getElementById('dbar').classList.remove('on');
+function gameOver(){G.phase='over';document.getElementById('dbar').classList.remove('on');hidePic();hidePhotos();
   transition(()=>{scene('bg_ending');document.getElementById('heroImg').style.opacity='0';
     run([{who:'guide',expr:'explain',text:`이제 남은 돈이 ${G.money}만원이라, 더 먼 여행은 어렵게 됐어.`},
-      {who:'guide',expr:'pray',text:`그래도 그동안 ${G.visited.length}개 나라나 여행했어! 정말 멋진 여행이었어 🎉`},
-      {who:'guide',expr:'normal',text:'(여행을 정리하고 복습하는 화면은 다음 단계에서 보여줄게!)'}],()=>{});});}
+      {who:'guide',expr:'pray',text:`무료 귀국 티켓으로 대한민국에 돌아왔어 ✈️ 그동안 ${G.visited.length}개 나라나 여행했어, 정말 수고했어 ${vocative(G.name)}! 🎉`},
+      {who:'guide',expr:'normal',text:'우리가 어디어디 다녀왔는지, 성적표로 정리해볼까?'}],showReview);});}
+function showReview(){document.getElementById('dbar').classList.remove('on');G.phase='review';
+  const n=G.visited.length,g=n>=15?['🏆','세계 여행 마스터']:n>=10?['🥇','베테랑 여행가']:n>=6?['🥈','멋진 여행가']:n>=3?['🥉','씩씩한 여행가']:['🌱','여행 새내기'];
+  const rows=G.visited.map((iso,i)=>{const r=R[iso],f=FOOD[iso];return `<div class="rvrow"><span class="rvno">${i+1}</span><img src="flags/${iso}.svg" alt=""><div class="rvtxt"><b>${r.ko}</b><span>수도 ${r.capKo}${f?' · '+f.f.split('(')[0].trim():''}</span></div></div>`;}).join('');
+  const q=document.getElementById('quiz');q.classList.add('on');
+  q.innerHTML=`<div class="qpanel rv"><div class="rvtitle">${g[0]} 여행 성적표</div><div class="rvscore">방문 <b>${n}</b>개국 · 남은 돈 <b>${G.money}</b>만원<br><span class="rvgrade">${g[1]}</span></div><div class="rvlist">${rows||'<div class="rvempty">아직 방문한 나라가 없어요</div>'}</div><button class="btn rvbtn" id="rvRestart">🔄 다시 여행하기</button></div>`;
+  document.getElementById('rvRestart').onclick=()=>location.reload();}
 function leaveHotel(){transition(()=>{mapview();budgetGuard(()=>{document.getElementById('dbar').classList.remove('on');G.phase='map';tip('👆 두 손가락으로 확대·축소! 다음 나라를 눌러봐');});});}
 function endGame(){document.getElementById('dbar').classList.remove('on');const t=document.createElement('div');t.className='endmsg';t.textContent='👋 다음에 또 만나!';document.getElementById('game').appendChild(t);}
 setVB();
