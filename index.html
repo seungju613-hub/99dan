@@ -195,8 +195,8 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
       <p class="sub">엄마 아빠도 같이 도전해보세요.<br>함께 할 때 더 재밌답니다 :)</p>
       <div class="tools">
         <span class="chip">🧮 <b>수학</b></span>
-        <span class="chip">💣 <b>구구단</b></span>
-        <span class="chip">👾 <b>슬라임 키우기</b></span>
+        <span class="chip">🌍 <b>세계여행</b></span>
+        <span class="chip">📜 <b>속담·국어</b></span>
         <span class="chip">📱 <b>폰·컴 모두</b></span>
       </div>
     </div>
@@ -247,14 +247,14 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
           <span class="go">▶ 시작하기</span>
         </a>
 
-        <!-- 커밍순 메시지 -->
-        <div class="block c-eng soon">
-          <span class="tag">준비중</span>
-          <span class="face">✨</span>
-          <h3>커밍순</h3>
-          <p>영어·과학·사회 등 새로운 놀이 블록을<br>만들고 있어요. 곧 만나요!</p>
-          <span class="go">🔧 준비중</span>
-        </div>
+        <!-- 세계여행 (비밀번호 입장 · 제작 중) -->
+        <a class="block c-eng ready" href="#" onclick="wtGo();return false;">
+          <span class="tag">🔒 사회</span>
+          <span class="face">🌍</span>
+          <h3>천만원으로 세계여행</h3>
+          <p>국기·수도를 맞히며 세계를 여행해요! 예산과 체력을 관리하는 여행 학습 게임. (제작 중)</p>
+          <span class="go">🔒 입장하기</span>
+        </a>
 
       </div>
     </div>
@@ -327,5 +327,9 @@ footer{margin-top:44px;border-top:2px solid var(--line);padding:26px 0 40px;text
 })();
 </script>
 
+<script>
+/* 세계여행 비밀번호 입장 (임시 잠금 · 완성 후 카드 href를 world-travel-story.html 로 바꾸고 이 함수는 지우면 됩니다) */
+function wtGo(){var p=prompt('비밀번호를 입력하세요');if(p==='0905'){location.href='world-travel-story.html';}else if(p!==null){alert('비밀번호가 올바르지 않아요.');}}
+</script>
 </body>
 </html>
