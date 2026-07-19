@@ -1,23 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko"><head>
-<script>
-/* WT_GATE 간단 비밀번호 잠금(임시, 미완성 보호용) */
-(function(){try{
-  if(sessionStorage.getItem('wt_ok')==='1')return;
-  var pw=prompt('비밀번호를 입력하세요');
-  if(pw==='0905'){sessionStorage.setItem('wt_ok','1');}
-  else{document.documentElement.innerHTML='<div style="display:flex;height:100vh;align-items:center;justify-content:center;font-family:sans-serif;font-size:20px;color:#555">비밀번호가 필요합니다.</div>';throw new Error('locked');}
-}catch(e){if(e.message!=='locked')console.log(e);}})();
-</script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#1a1633">
 <title>천만원으로 세계여행</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;overflow:hidden;font-family:'Jua','Baloo 2','Malgun Gothic',sans-serif;background:#1a1633;user-select:none}
-  #app{position:fixed;inset:0;overflow:hidden}
+  html,body{height:100%;height:100dvh;overflow:hidden;overscroll-behavior:none;position:fixed;inset:0;width:100%;font-family:'Jua','Baloo 2','Malgun Gothic',sans-serif;background:#1a1633;user-select:none}
+  #app{position:fixed;inset:0;height:100dvh;overflow:hidden}
   .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background-size:cover;background-position:center;padding:20px;text-align:center}
   .screen.on{display:flex}
   .titlebox{background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.5);border-radius:24px;padding:26px 30px;backdrop-filter:blur(4px)}
@@ -90,7 +81,7 @@
   #polaroidImg{width:100%;height:min(30vh,220px);object-fit:cover;border-radius:3px;display:block;background:#e8eef5}
   #polaroidCap{text-align:center;font-size:15px;color:#3a2a66;font-weight:800;margin-top:6px}
   #polaroid .cr{position:absolute;right:7px;bottom:5px;font-size:8px;color:#b3b3b3}
-  #photos{position:absolute;top:5%;left:50%;transform:translateX(-50%);z-index:6;display:none;gap:12px}
+  #photos{position:absolute;top:5%;left:50%;transform:translateX(-50%);z-index:10;display:none;gap:12px}
   #photos.on{display:flex}
   #photos .pol{background:#fff;padding:7px 7px 20px;border-radius:6px;box-shadow:0 8px 20px rgba(0,0,0,.32);width:min(210px,32vw);position:relative}
   #photos .pol:first-child{transform:rotate(-3deg)}#photos .pol:last-child{transform:rotate(3deg)}
@@ -172,10 +163,20 @@ function fitBox(a,b,c,dd,pad){let x0=PX(a),x1=PX(c),y0=PY(dd),y1=PY(b);if(x1<x0)
 function c2v(cx,cy){const rc=svg.getBoundingClientRect();return{x:vb.x+(cx-rc.left)/rc.width*vb.w,y:vb.y+(cy-rc.top)/rc.height*vb.h};}
 function zoomAt(cx,cy,f){const p=c2v(cx,cy);let nw=Math.max(30,Math.min(W,vb.w*f)),nh=nw*(vb.h/vb.w);vb.x=p.x-(p.x-vb.x)*(nw/vb.w);vb.y=p.y-(p.y-vb.y)*(nh/vb.h);vb.w=nw;vb.h=nh;setVB();}
 svg.addEventListener('wheel',e=>{if(G.phase!=='map')return;e.preventDefault();zoomAt(e.clientX,e.clientY,e.deltaY>0?1.15:.87);},{passive:false});
-let drag=null;
-svg.addEventListener('pointerdown',e=>{if(G.phase!=='map')return;drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y,moved:false};});
-svg.addEventListener('pointermove',e=>{if(!drag)return;const rc=svg.getBoundingClientRect();const dx=(e.clientX-drag.x)/rc.width*vb.w,dy=(e.clientY-drag.y)/rc.height*vb.h;if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>4)drag.moved=true;vb.x=drag.vx-dx;vb.y=drag.vy-dy;setVB();});
-window.addEventListener('pointerup',()=>{setTimeout(()=>{drag=null;},0);});
+function dist2(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+let ptrs=new Map(),drag=null,pinch=null;
+svg.addEventListener('pointerdown',e=>{if(G.phase!=='map')return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1){drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y,moved:false};pinch=null;}
+  else if(ptrs.size===2){drag=null;const p=[...ptrs.values()];pinch={d:dist2(p[0],p[1])||1,mx:(p[0].x+p[1].x)/2,my:(p[0].y+p[1].y)/2,vb:{...vb}};}});
+svg.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});const rc=svg.getBoundingClientRect();
+  if(pinch&&ptrs.size>=2){const p=[...ptrs.values()],nd=dist2(p[0],p[1])||1,f=Math.max(.2,Math.min(4,pinch.d/nd));
+    let nw=Math.max(30,Math.min(W,pinch.vb.w*f)),nh=nw*(pinch.vb.h/pinch.vb.w);
+    vb.x=pinch.vb.x+(pinch.mx-rc.left)/rc.width*(pinch.vb.w-nw);vb.y=pinch.vb.y+(pinch.my-rc.top)/rc.height*(pinch.vb.h-nh);vb.w=nw;vb.h=nh;setVB();}
+  else if(drag){const dx=(e.clientX-drag.x)/rc.width*vb.w,dy=(e.clientY-drag.y)/rc.height*vb.h;if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>4)drag.moved=true;vb.x=drag.vx-dx;vb.y=drag.vy-dy;setVB();}});
+function endPtr(e){ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;
+  if(ptrs.size===1){const p=[...ptrs.values()][0];drag={x:p.x,y:p.y,vx:vb.x,vy:vb.y,moved:true};}
+  else if(ptrs.size===0){setTimeout(()=>{drag=null;},0);}}
+svg.addEventListener('pointerup',endPtr);svg.addEventListener('pointercancel',endPtr);
 svg.addEventListener('click',e=>{if(G.phase!=='map')return;if(drag&&drag.moved)return;const iso=e.target.getAttribute&&e.target.getAttribute('data-iso');if(iso&&iso!==G.cur.iso)startTravel(iso);});
 // 화면/장면
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById('game').classList.remove('on');if(id==='game')document.getElementById('game').classList.add('on');else document.getElementById(id).classList.add('on');}
@@ -185,7 +186,7 @@ document.getElementById('scTitle').style.backgroundImage=`url(${BG}bg_intro.jpg)
 document.getElementById('sleepNight').style.backgroundImage=`url(${BG}bg_hotel_night.jpg)`;
 ['scHero','scName','scGuide'].forEach(i=>document.getElementById(i).style.backgroundImage=`url(${BG}bg_sky.jpg)`);
 function scene(bg){document.getElementById('mapwrap').classList.remove('on');document.getElementById('scene').classList.add('on');if(bg)document.getElementById('scene').style.backgroundImage=`url(${BG}${bg}.jpg)`;}
-function mapview(){hidePic();hidePhotos();document.getElementById('scene').classList.remove('on');document.getElementById('heroImg').style.opacity='0';document.getElementById('mapwrap').classList.add('on');setVB();}
+function mapview(){hidePic();hidePhotos();target=null;vb={x:0,y:0,w:W,h:H};document.getElementById('scene').classList.remove('on');document.getElementById('heroImg').style.opacity='0';document.getElementById('mapwrap').classList.add('on');setVB();}
 function setHero(expr){const im=document.getElementById('heroImg');im.src=`characters/hero_${G.hero}_${expr||'happy'}.png`;im.style.opacity='1';}
 function setSpeaker(who,expr){const slot=document.getElementById('guide');if(who==='guide'){slot.innerHTML=`<img src="characters/fairy_${G.guide}_${expr||'normal'}.png">`;document.getElementById('who').textContent=GN[G.guide];}else{slot.innerHTML='';document.getElementById('who').textContent='';}}
 function setHUD(m,h){G.money=m;G.hp=h;document.getElementById('mv').textContent=m;document.getElementById('hv').textContent=h;document.getElementById('vv').textContent=G.visited.length;document.getElementById('mBar').style.width=Math.min(100,m/1000*100)+'%';document.getElementById('hBar').style.width=Math.min(100,h)+'%';}
@@ -323,9 +324,9 @@ function arrive(){G.cur=T.dest;G.visited.push(T.dest.iso);setHUD(G.money,G.hp);
      {who:'guide',expr:'explain',hero:'happy',pic:'foodbg',text:foodLine(T.dest)+(f?' 뒤에 보이는 게 바로 그 음식이야 😋':'')}];
     if(!G.exchangeDone){lines.push({who:'guide',expr:'explain',text:exchangeLine(T.dest)});G.exchangeDone=true;}
     run(lines,hotelStep);});}
-function hotelStep(){G.hotelCost=HOTEL[T.dest.tier];transition(()=>{scene('bg_hotel_day');setHero('happy');showPhotos();
-  run([{who:'guide',expr:'normal',text:`오늘 ${T.dest.ko}에서 본 풍경과 음식이야, 멋지지? 다음 여행 비행기는 내일 있으니까, 오늘 하룻밤은 여기서 묵어야 해. (호텔 ${G.hotelCost}만원, ${tierWord(T.dest.tier)})`,
-    choices:[{label:'하룻밤 잔다 🛏️',go:()=>{hidePhotos();doSleep(afterNight1);}}]}]);});}
+function hotelStep(){G.hotelCost=HOTEL[T.dest.tier];transition(()=>{scene('bg_hotel_day');setHero('happy');hidePhotos();
+  run([{who:'guide',expr:'normal',text:`${T.dest.ko}의 호텔은 하룻밤에 ${G.hotelCost}만원이야. ${tierWord(T.dest.tier)} 다음 여행 비행기는 내일 있으니까, 오늘 하룻밤은 여기서 묵어야 해.`,
+    choices:[{label:'하룻밤 잔다 🛏️',go:()=>doSleep(afterNight1)}]}]);});}
 // 해 뜨고 지는 수면 애니메이션(기본 10초, 빨리감기 가능)
 function sleepAnim(done){const fx=document.getElementById('sleepFx'),night=document.getElementById('sleepNight'),body=document.getElementById('sleepBody'),ff=document.getElementById('sleepFF');
   fx.classList.add('on');let dur=10000,t0=null,sped=false;ff.onclick=()=>{sped=true;};
@@ -336,7 +337,7 @@ function sleepAnim(done){const fx=document.getElementById('sleepFx'),night=docum
   requestAnimationFrame(fr);}
 function doSleep(after){const hc=G.hotelCost;G.money=Math.max(0,G.money-hc);setHUD(G.money,G.hp);
   document.getElementById('dbar').classList.remove('on');document.getElementById('heroImg').style.opacity='0';G.phase='sleep';
-  transition(()=>{scene('bg_hotel_day');sleepAnim(()=>{G.hp=Math.min(100,G.hp+HP_NIGHT);setHUD(G.money,G.hp);setHero('happy');after();});});}
+  transition(()=>{scene('bg_hotel_day');showPhotos();sleepAnim(()=>{hidePhotos();G.hp=Math.min(100,G.hp+HP_NIGHT);setHUD(G.money,G.hp);setHero('happy');after();});});}
 function afterNight1(){run([{who:'guide',expr:'pray',text:`잘 잤어? 체력을 ${HP_NIGHT}만큼 회복했어! 지금까지 ${G.visited.length}군데를 여행했고, 남은 돈은 ${G.money}만원이야.`}],offer2nd);}
 function offer2nd(){if(G.money<G.hotelCost){run([{who:'guide',expr:'normal',text:'이제 다음 나라로 떠나볼까?'}],leaveHotel);return;}
   run([{who:'guide',expr:'normal',text:`한 번 더 자면 체력도 더 채우고, 카드 뒤집기 미니게임으로 용돈도 벌 수 있어! 하룻밤 더 잘까? (호텔비 ${G.hotelCost}만원)`,
@@ -346,7 +347,7 @@ function leaveHotel(){transition(()=>{document.getElementById('dbar').classList.
 function endGame(){document.getElementById('dbar').classList.remove('on');const t=document.createElement('div');t.className='endmsg';t.textContent='👋 다음에 또 만나!';document.getElementById('game').appendChild(t);}
 setVB();
 // 테스트 훅
-window.__s={G,R,vocative,ticketMax,applyDisc,ff:()=>document.getElementById('sleepFF').click(),
+window.__s={G,R,vocative,ticketMax,applyDisc,ff:()=>document.getElementById("sleepFF").click(),vbw:()=>vb.w,
  start:()=>document.getElementById('startBtn').click(),pickHero:h=>document.querySelector(`#scHero .pick[data-hero="${h}"]`).click(),
  setName:n=>{document.getElementById('nameIn').value=n;document.getElementById('nameBtn').click();},pickGuide:g=>document.querySelector(`#scGuide .pick[data-guide="${g}"]`).click(),
  advance,choose:i=>document.getElementById('choices').children[i].click(),travel:iso=>startTravel(iso),
