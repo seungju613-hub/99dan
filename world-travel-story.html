@@ -38,28 +38,28 @@
   .cont{font-family:'Jua',sans-serif;fill:#fff;font-weight:800;text-anchor:middle;paint-order:stroke;stroke:#111;stroke-width:2.4px}
   .clbl{font-family:'Jua',sans-serif;fill:#28304a;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:2px}
   .isle{fill:#FFD23F;stroke:#E8990C;stroke-width:.8;vector-effect:non-scaling-stroke}
-  #hud{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 14px;pointer-events:none}
+  #hud{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:8px 10px;pointer-events:none}
   #hudbars{display:flex;flex-direction:column;gap:7px}
-  .hrow{display:flex;align-items:center;gap:8px;background:rgba(43,60,110,.62);border-radius:999px;padding:5px 13px 5px 11px;color:#fff;font-weight:800;font-size:17px}
-  .hlab{font-size:19px}
-  .hbar{display:block;width:min(46vw,190px);height:13px;background:rgba(255,255,255,.28);border-radius:7px;overflow:hidden}
+  .hrow{display:flex;align-items:center;gap:6px;background:rgba(43,60,110,.62);border-radius:999px;padding:4px 11px 4px 9px;color:#fff;font-weight:800;font-size:15px}
+  .hlab{font-size:16px}
+  .hbar{display:block;width:min(34vw,140px);height:12px;background:rgba(255,255,255,.28);border-radius:6px;overflow:hidden}
   .hbar i{display:block;height:100%;width:0;border-radius:7px;transition:width .3s}
-  .hrow b{min-width:2.6em;text-align:right;color:#FFE9A8}
-  #hudcount{background:rgba(43,60,110,.62);border-radius:999px;padding:9px 16px;color:#fff;font-weight:800;font-size:17px;white-space:nowrap}
+  .hrow b{min-width:2.2em;text-align:right;color:#FFE9A8}
+  #hudcount{background:rgba(43,60,110,.62);border-radius:999px;padding:6px 12px;color:#fff;font-weight:800;font-size:14px;white-space:nowrap;align-self:flex-start}
   #hudcount b{color:#FFE9A8}
   .chip{background:rgba(43,60,110,.6);border-radius:999px;padding:5px 12px;font-size:14px;display:flex;align-items:center;gap:6px}
   .chip b{color:#FFE9A8}.bar{display:block;height:6px;width:74px;background:rgba(255,255,255,.28);border-radius:3px;overflow:hidden;margin-left:4px}
   .bar i{display:block;height:100%;width:0;border-radius:3px;transition:width .3s}#mBar{background:#FFE9A8}#hBar{background:#FF9AAE}
-  #tip{position:absolute;top:44px;left:50%;transform:translateX(-50%);z-index:4;background:rgba(43,35,80,.82);color:#fff;padding:6px 16px;border-radius:999px;font-weight:700;font-size:14px;display:none}
+  #tip{position:absolute;top:98px;left:50%;transform:translateX(-50%);z-index:4;background:rgba(43,35,80,.85);color:#fff;padding:7px 16px;border-radius:999px;font-weight:700;font-size:13px;display:none;max-width:90%;text-align:center}
   #tip.on{display:block}
-  #dbar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:none;align-items:flex-end;gap:10px;padding:10px clamp(12px,4vw,60px) calc(12px + env(safe-area-inset-bottom))}
-  #dbar.on{display:flex}
-  #guide{flex:0 0 auto;width:clamp(80px,13vw,120px);height:clamp(105px,19vw,165px);display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 6px 10px rgba(0,0,0,.22))}
+  #dbar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:none;padding:0 8px calc(8px + env(safe-area-inset-bottom))}
+  #dbar.on{display:block}
+  #guide{position:absolute;left:12px;bottom:calc(100% - 62px);width:clamp(82px,20vw,124px);height:clamp(116px,27vw,166px);z-index:2;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.28))}
   #guide img{width:100%;height:100%;object-fit:contain}
-  #bubble{flex:1;background:#fff;border-radius:20px;padding:14px 20px;min-height:110px;position:relative;box-shadow:0 8px 26px rgba(40,60,110,.3);border:3px solid #EBD9A8}
-  #bubble:after{content:'';position:absolute;left:-14px;bottom:28px;border:12px solid transparent;border-right-color:#fff}
-  #who{font-size:14px;font-weight:800;color:#8A5CE0;margin-bottom:4px}
-  #text{font-size:clamp(15px,3.2vw,20px);line-height:1.5;color:#2b2350;font-weight:700;min-height:2.4em}
+  #bubble{position:relative;width:100%;background:#fff;border-radius:22px;padding:66px 20px 16px;min-height:150px;box-shadow:0 -3px 26px rgba(40,60,110,.26);border:3px solid #EBD9A8}
+
+  #who{position:absolute;top:22px;left:calc(clamp(82px,20vw,124px) + 24px);font-size:16px;font-weight:800;color:#8A5CE0}
+  #text{font-size:clamp(16px,3.6vw,21px);line-height:1.55;color:#2b2350;font-weight:700;min-height:2em}
   #next{position:absolute;right:16px;bottom:10px;font-size:18px;color:#8A5CE0;animation:bob 1s infinite;display:none}
   @keyframes bob{50%{transform:translateY(3px)}}
   #choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -76,15 +76,20 @@
   .caps{display:flex;flex-direction:column;gap:8px}
   .caps button{border:2px solid #cfe0f5;background:#f7fbff;border-radius:12px;padding:12px;font-family:inherit;font-weight:800;font-size:16px;color:#2b2350;cursor:pointer}
   .caps button.ok{border-color:#2FB86E;background:#e9f9f1}.caps button.no{border-color:#E05656;background:#fde9e9;opacity:.7}
-  .cards6{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0}
-  .gcard{aspect-ratio:3/4;border:none;border-radius:14px;background:linear-gradient(160deg,#7C83FF,#A66BFF);color:#fff;font-size:clamp(16px,4.5vw,22px);font-weight:800;cursor:pointer;box-shadow:0 5px 0 rgba(60,50,120,.35);display:flex;align-items:center;justify-content:center;transition:transform .12s}
-  .gcard:active{transform:translateY(2px)}
-  .gcard.flip{background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.12)}
-  .gcard.plus{color:#2FB86E;border:3px solid #2FB86E}.gcard.minus{color:#E05656;border:3px solid #E05656}
+  .qpanel.mg{max-width:460px;width:96%}
+  .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+  .mcard{aspect-ratio:3/4;border:none;border-radius:9px;background:linear-gradient(160deg,#7C83FF,#A66BFF);cursor:pointer;padding:0;overflow:hidden;position:relative;box-shadow:0 3px 0 rgba(60,50,120,.3)}
+  .mcard::after{content:'?';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800}
+  .mcard.show{background:#fff}.mcard.show::after{display:none}
+  .mcard img{width:100%;height:66%;object-fit:contain;display:block;padding:4px 4px 0;visibility:hidden}
+  .mcard span{display:block;font-size:9px;font-weight:800;color:#3a2a66;text-align:center;line-height:1.05;padding:1px;visibility:hidden}
+  .mcard.show img,.mcard.show span{visibility:visible}
+  .mcard.done{opacity:.4}
+  #mgTime{font-size:15px;color:#E0632B;font-weight:800}
   .qhint{font-size:14px;color:#6f6f92;font-weight:700;margin-top:4px}
   .coin-fly{position:absolute;z-index:8;font-size:24px;pointer-events:none;transition:all .6s cubic-bezier(.4,1.3,.6,1)}
   #sleepFx{position:absolute;inset:0;z-index:8;display:none}#sleepFx.on{display:block}
-  #sleepNight{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0}
+  #sleepNight{position:absolute;inset:0;background:#0b1030;opacity:0}
   #sleepBody{position:absolute;font-size:46px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 14px rgba(255,240,180,.85))}
   #sleepZzz{position:absolute;left:50%;top:50%;transform:translateX(-50%);font-size:clamp(70px,20vw,120px);text-shadow:0 4px 12px rgba(0,0,0,.3);animation:zzz 1.8s infinite}
   @keyframes zzz{0%{opacity:.25;transform:translate(-50%,4px)}50%{opacity:.95;transform:translate(-50%,-4px)}100%{opacity:.25;transform:translate(-50%,4px)}}
@@ -95,7 +100,7 @@
   #polaroidImg{width:100%;height:min(30vh,220px);object-fit:contain;border-radius:3px;display:block;background:#eef2f8}
   #polaroidCap{text-align:center;font-size:15px;color:#3a2a66;font-weight:800;margin-top:6px}
   #polaroid .cr{position:absolute;right:7px;bottom:5px;font-size:8px;color:#b3b3b3}
-  #photos{position:absolute;top:5%;left:50%;transform:translateX(-50%);z-index:10;display:none;gap:12px}
+  #photos{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;display:none;gap:12px}
   #photos.on{display:flex}
   #photos .pol{background:#fff;padding:7px 7px 20px;border-radius:6px;box-shadow:0 8px 20px rgba(0,0,0,.32);width:min(210px,32vw);position:relative}
   #photos .pol:first-child{transform:rotate(-3deg)}#photos .pol:last-child{transform:rotate(3deg)}
@@ -197,9 +202,8 @@ function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.re
 function transition(fn){const f=document.getElementById('fade');f.classList.add('on');setTimeout(()=>{fn&&fn();setTimeout(()=>f.classList.remove('on'),40);},270);}
 function setBG(id){document.getElementById(id).style.backgroundImage=`url(${BG}bg_intro.jpg)`;}
 document.getElementById('scTitle').style.backgroundImage=`url(${BG}bg_intro.jpg)`;
-document.getElementById('sleepNight').style.backgroundImage=`url(${BG}bg_hotel_night.jpg)`;
 ['scHero','scName','scGuide'].forEach(i=>document.getElementById(i).style.backgroundImage=`url(${BG}bg_sky.jpg)`);
-function scene(bg){const sc=document.getElementById('scene');document.getElementById('mapwrap').classList.remove('on');sc.classList.add('on');if(bg){sc.style.backgroundImage=`url(${BG}${bg}.jpg)`;if(bg.indexOf('hotel')>=0){sc.style.backgroundSize='150%';sc.style.backgroundPosition='22% 88%';}else{sc.style.backgroundSize='cover';sc.style.backgroundPosition='center';}}}
+function scene(bg){const sc=document.getElementById('scene');document.getElementById('mapwrap').classList.remove('on');sc.classList.add('on');if(bg){sc.style.backgroundImage=`url(${BG}${bg}.jpg)`;if(bg.indexOf('hotel')>=0){sc.style.backgroundSize='170%';sc.style.backgroundPosition='14% 96%';}else{sc.style.backgroundSize='cover';sc.style.backgroundPosition='center';}}}
 function showMapRaw(){hidePic();hidePhotos();document.getElementById('scene').classList.remove('on');document.getElementById('heroImg').style.opacity='0';document.getElementById('mapwrap').classList.add('on');}
 function mapview(){target=null;showMapRaw();resetView();}
 function setHero(expr){const im=document.getElementById('heroImg');im.src=`characters/hero_${G.hero}_${expr||'happy'}.png`;im.style.opacity='1';}
@@ -365,27 +369,40 @@ function sleepAnim(done){const fx=document.getElementById('sleepFx'),night=docum
   requestAnimationFrame(fr);}
 function doSleep(after){const hc=G.hotelCost;G.money=Math.max(0,G.money-hc);setHUD(G.money,G.hp);
   document.getElementById('dbar').classList.remove('on');document.getElementById('heroImg').style.opacity='0';G.phase='sleep';
-  transition(()=>{scene('bg_hotel_day');var _n=document.getElementById('sleepNight');_n.style.backgroundSize='150%';_n.style.backgroundPosition='22% 88%';showPhotos();sleepAnim(()=>{hidePhotos();G.hp=Math.min(100,G.hp+HP_NIGHT);setHUD(G.money,G.hp);setHero('happy');after();});});}
+  transition(()=>{scene('bg_hotel_day');showPhotos();sleepAnim(()=>{hidePhotos();G.hp=Math.min(100,G.hp+HP_NIGHT);setHUD(G.money,G.hp);setHero('happy');after();});});}
 function afterNight1(){run([{who:'guide',expr:'pray',text:`잘 잤어? 체력을 ${HP_NIGHT}만큼 회복했어! 지금까지 ${G.visited.length}군데를 여행했고, 남은 돈은 ${G.money}만원이야.`}],offer2nd);}
 function offer2nd(){if(G.money<G.hotelCost){run([{who:'guide',expr:'normal',text:'이제 다음 나라로 떠나볼까?'}],leaveHotel);return;}
-  const _ex=cardAllowed()?'카드 뒤집기로 용돈도 벌 수 있어! ':'';
+  const _ex=cardAllowed()?'국기 기억력 게임으로 용돈을 벌 수도, 잃을 수도 있어! ':'';
   run([{who:'guide',expr:'normal',text:`한 번 더 자면 체력도 더 채우고, ${_ex}하룻밤 더 잘까? (호텔비 ${G.hotelCost}만원)`,
     choices:[{label:'한 번 더 잔다 🛏️',go:()=>doSleep(afterNight2)},{label:'이제 떠날래 ✈️',go:leaveHotel}]}]);}
 function cardAllowed(){return G.cardPlays<3 && (G.visited.length-G.lastCardVisit)>=2;}
-function afterNight2(){if(cardAllowed())run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 이제 카드 뒤집기로 용돈을 얻어볼까? 🃏'}],cardGame);else run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 체력도 든든하게 채웠어 😊'}],leaveHotel);}
-function cardGame(){G.phase='quiz';document.getElementById('dbar').classList.remove('on');scene('bg_minigame');document.getElementById('heroImg').style.opacity='0';
-  const vals=shuffle([20,15,10,5,-10,-15]);let flips=0,sum=0,over=false;
+function afterNight2(){if(cardAllowed())run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 이제 국기 기억력 게임을 해볼까? 같은 국기 짝을 찾는 거야! 🎴'}],memGame);else run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 체력도 든든하게 채웠어 😊'}],leaveHotel);}
+const MEM_PREVIEW=3000, MEM_TIME=60;  // 미리보기 3초, 제한 60초(초등 기준·추후 조정)
+function memGame(){G.phase='quiz';document.getElementById('dbar').classList.remove('on');scene('bg_minigame');document.getElementById('heroImg').style.opacity='0';
+  const pool=shuffle(DATA.roster.filter(r=>r.iso!=='kr')).slice(0,8);
+  const deck=shuffle(pool.concat(pool));
   const q=document.getElementById('quiz');q.classList.add('on');
-  q.innerHTML='<div class="qpanel"><div class="qlabel">🃏 카드 <b>2장</b>을 뒤집어 용돈을 얻어보자!</div><div class="cards6" id="cardRow"></div><div class="qhint" id="cardHint">2장을 골라봐 (좋은 카드도, 아쉬운 카드도 있어)</div></div>';
-  const row=document.getElementById('cardRow');
-  vals.forEach(v=>{const c=document.createElement('button');c.className='gcard';c.textContent='?';
-    c.onclick=()=>{if(over||c.classList.contains('flip'))return;c.classList.add('flip');c.textContent=(v>=0?'+':'')+v+'만';c.classList.add(v>=0?'plus':'minus');flips++;sum+=v;
-      document.getElementById('cardHint').textContent=flips>=2?'':'한 장 더 골라봐';
-      if(flips>=2){over=true;G.cardPlays++;G.lastCardVisit=G.visited.length;
-        setTimeout(()=>{document.getElementById('quiz').classList.remove('on');G.money=Math.max(0,G.money+sum);setHUD(G.money,G.hp);
-          const msg=sum>0?`와! 카드로 용돈 ${sum}만원을 얻었어! 🎉`:(sum<0?`앗, 이번엔 ${-sum}만원을 잃었어. 다음엔 더 좋은 카드가 나올 거야!`:'딱 본전이네! 😄');
-          run([{who:'guide',expr:sum>=0?'pray':'explain',text:msg}],leaveHotel);},850);}};
-    row.appendChild(c);});}
+  q.innerHTML='<div class="qpanel mg"><div class="qlabel">🎴 같은 국기 짝을 찾아라! &nbsp;<span id="mgTime">준비…</span></div><div class="mgrid" id="mgrid"></div><div class="qhint" id="mgHint">잘 기억하세요! 곧 카드가 뒤집혀요 👀</div></div>';
+  const grid=document.getElementById('mgrid');
+  let first=null,lock=true,matched=0,timeLeft=MEM_TIME,timer=null,ended=false;
+  const cards=deck.map(r=>{const c=document.createElement('button');c.className='mcard show';
+    c.innerHTML=`<img src="flags/${r.iso}.svg" alt=""><span>${r.ko}</span>`;c.dataset.iso=r.iso;
+    c.onclick=()=>flip(c);grid.appendChild(c);return c;});
+  function flip(c){if(lock||ended||c.classList.contains('done')||c===first||c.classList.contains('show'))return;
+    c.classList.add('show');
+    if(!first){first=c;return;}
+    lock=true;
+    if(first.dataset.iso===c.dataset.iso){const a=first;first=null;setTimeout(()=>{a.classList.add('done');c.classList.add('done');lock=false;matched++;if(matched>=8)finish();},350);}
+    else{const a=first;first=null;setTimeout(()=>{a.classList.remove('show');c.classList.remove('show');lock=false;},750);}}
+  setTimeout(()=>{cards.forEach(c=>c.classList.remove('show'));lock=false;document.getElementById('mgHint').textContent='같은 국기 두 장을 찾아 짝지어봐!';
+    document.getElementById('mgTime').textContent='⏱️ '+timeLeft+'초';
+    timer=setInterval(()=>{timeLeft--;document.getElementById('mgTime').textContent='⏱️ '+timeLeft+'초';if(timeLeft<=0)finish();},1000);},MEM_PREVIEW);
+  function finish(){if(ended)return;ended=true;clearInterval(timer);G.cardPlays++;G.lastCardVisit=G.visited.length;
+    const reward=matched>=8?40:(matched>=5?20:(matched>=3?0:-10));
+    setTimeout(()=>{document.getElementById('quiz').classList.remove('on');G.money=Math.max(0,G.money+reward);setHUD(G.money,G.hp);
+      const msg=reward>0?`${matched}쌍을 맞췄어! 용돈 ${reward}만원 획득! 🎉`:(reward<0?`${matched}쌍밖에 못 맞췄어… ${-reward}만원을 잃었어. 다음엔 잘할 수 있어!`:`${matched}쌍 맞췄어! 딱 본전이야 😄`);
+      run([{who:'guide',expr:reward>=0?'pray':'explain',text:msg}],leaveHotel);},600);}
+  window.__mg={solve:()=>{const by={};cards.forEach(c=>{(by[c.dataset.iso]=by[c.dataset.iso]||[]).push(c);});const g=Object.values(by);let gi=0;(function step(){if(gi>=g.length)return;const pr=g[gi++];flip(pr[0]);flip(pr[1]);setTimeout(step,430);})();},state:()=>({matched,timeLeft,ended,cards:cards.length})};}
 function leaveHotel(){transition(()=>{document.getElementById('dbar').classList.remove('on');mapview();G.phase='map';tip('👆 두 손가락으로 확대·축소! 다음 나라를 눌러봐');});}
 function endGame(){document.getElementById('dbar').classList.remove('on');const t=document.createElement('div');t.className='endmsg';t.textContent='👋 다음에 또 만나!';document.getElementById('game').appendChild(t);}
 setVB();
