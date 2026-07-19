@@ -76,6 +76,12 @@
   .caps{display:flex;flex-direction:column;gap:8px}
   .caps button{border:2px solid #cfe0f5;background:#f7fbff;border-radius:12px;padding:12px;font-family:inherit;font-weight:800;font-size:16px;color:#2b2350;cursor:pointer}
   .caps button.ok{border-color:#2FB86E;background:#e9f9f1}.caps button.no{border-color:#E05656;background:#fde9e9;opacity:.7}
+  .cards6{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0}
+  .gcard{aspect-ratio:3/4;border:none;border-radius:14px;background:linear-gradient(160deg,#7C83FF,#A66BFF);color:#fff;font-size:clamp(16px,4.5vw,22px);font-weight:800;cursor:pointer;box-shadow:0 5px 0 rgba(60,50,120,.35);display:flex;align-items:center;justify-content:center;transition:transform .12s}
+  .gcard:active{transform:translateY(2px)}
+  .gcard.flip{background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+  .gcard.plus{color:#2FB86E;border:3px solid #2FB86E}.gcard.minus{color:#E05656;border:3px solid #E05656}
+  .qhint{font-size:14px;color:#6f6f92;font-weight:700;margin-top:4px}
   .coin-fly{position:absolute;z-index:8;font-size:24px;pointer-events:none;transition:all .6s cubic-bezier(.4,1.3,.6,1)}
   #sleepFx{position:absolute;inset:0;z-index:8;display:none}#sleepFx.on{display:block}
   #sleepNight{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0}
@@ -220,7 +226,7 @@ nameIn.oninput=()=>{const v=nameIn.value.trim();namePv.textContent=v?`${vocative
 document.getElementById('nameBtn').onclick=()=>{G.name=nameIn.value.trim()||'친구';transition(()=>show('scGuide'));};
 document.querySelectorAll('#scGuide .pick').forEach(c=>c.onclick=()=>{G.guide=c.dataset.guide;transition(startOnboarding);});
 // 온보딩
-function startOnboarding(){show('game');scene('bg_intro');setHero('happy');G.cur=kr;G.visited=[];setHUD(0,0);intro();}
+function startOnboarding(){show('game');scene('bg_intro');setHero('happy');G.cur=kr;G.visited=[];G.cardPlays=0;G.lastCardVisit=-99;setHUD(0,0);intro();}
 function intro(){run([{who:'guide',expr:'normal',hero:'happy',text:`안녕 ${vocative(G.name)}! 나는 너의 세계 여행을 도와줄 가이드 요정, ${GN[G.guide]}이야. 지금부터 나랑 같이 세계 여행을 떠나볼까?`,choices:[{label:'그래! 🌍',go:giveMoney},{label:'아니',cls:'no',go:endGame}]}]);}
 function giveMoney(){run([{who:'guide',expr:'normal',text:'좋아! 세계 여행 결심! 먼저 너에게 1000만원의 돈을 줄게.',choices:[{label:'받는다 💰',go:coinAnim}]}]);}
 function coinAnim(){setHero('excited');let m=0;const iv=setInterval(()=>{m+=50;setHUD(Math.min(1000,m),G.hp);const c=document.createElement('div');c.className='coin-fly';c.textContent='🪙';c.style.left='50%';c.style.top='62%';document.getElementById('game').appendChild(c);requestAnimationFrame(()=>{c.style.left='70px';c.style.top='16px';c.style.opacity='0';});setTimeout(()=>c.remove(),650);if(m>=1000){clearInterval(iv);run([{who:'guide',expr:'pray',text:'우와, 1000만원이 생겼어! 정말 신나지? 😆'}],()=>{setHero('happy');explainHP();});}},60);}
@@ -323,7 +329,15 @@ function showPhotos(){const ph=document.getElementById('photos'),f=FOOD[T.dest.i
   ph.classList.add('on');}
 function hidePhotos(){document.getElementById('photos').classList.remove('on');}
 function capImage(d,cb){wikiImage([{lang:'ko',title:d.capKo},{lang:'en',title:d.capEn}],cb);}
-function foodImage(d,cb){const f=FOOD[d.iso];if(!f){cb(null);return;}const t=f.f.split('(')[0].trim();wikiImage([{lang:'ko',title:t+' (요리)'},{lang:'ko',title:t+' (음식)'},{lang:'ko',title:t}],cb);}
+function wikiSearchImage(query,lang,cb){if(typeof fetch!=='function'||!query){cb(null);return;}const ck='S:'+lang+':'+query;if(wikiCache[ck]!==undefined){cb(wikiCache[ck]);return;}
+  fetch(`https://${lang}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=440&format=json&origin=*`)
+   .then(r=>r.json()).then(d=>{let src=null;const pg=d&&d.query&&d.query.pages;if(pg)for(const k in pg){if(pg[k].thumbnail&&pg[k].thumbnail.source)src=pg[k].thumbnail.source;}wikiCache[ck]=src;cb(src);}).catch(()=>{wikiCache[ck]=null;cb(null);});}
+function foodImage(d,cb){const f=FOOD[d.iso];if(!f){cb(null);return;}const t=f.f.split('(')[0].trim();
+  wikiImage([{lang:'ko',title:t+' (요리)'},{lang:'ko',title:t+' (음식)'},{lang:'ko',title:t}],u=>{
+    if(u){cb(u);return;}
+    wikiSearchImage(t+' 요리','ko',u2=>{if(u2){cb(u2);return;}
+      wikiSearchImage(t,'ko',u3=>{if(u3){cb(u3);return;}
+        wikiSearchImage(t,'en',u4=>cb(u4));});});});}
 function exchangeLine(d){const w=`${d.ko}${josaEun(d.ko)}`;
   if(d.tier==='low')return `${w} 우리나라보다 물가가 낮은 편이야. 그래서 호텔도 더 저렴해! 나라마다 돈의 가치가 다른 걸 '환율'이라고 해.`;
   if(d.tier==='high')return `${w} 우리나라보다 물가가 높은 편이야. 그래서 호텔이 조금 비싸. 나라마다 돈의 가치가 다른 걸 '환율'이라고 해.`;
@@ -354,14 +368,29 @@ function doSleep(after){const hc=G.hotelCost;G.money=Math.max(0,G.money-hc);setH
   transition(()=>{scene('bg_hotel_day');var _n=document.getElementById('sleepNight');_n.style.backgroundSize='150%';_n.style.backgroundPosition='22% 88%';showPhotos();sleepAnim(()=>{hidePhotos();G.hp=Math.min(100,G.hp+HP_NIGHT);setHUD(G.money,G.hp);setHero('happy');after();});});}
 function afterNight1(){run([{who:'guide',expr:'pray',text:`잘 잤어? 체력을 ${HP_NIGHT}만큼 회복했어! 지금까지 ${G.visited.length}군데를 여행했고, 남은 돈은 ${G.money}만원이야.`}],offer2nd);}
 function offer2nd(){if(G.money<G.hotelCost){run([{who:'guide',expr:'normal',text:'이제 다음 나라로 떠나볼까?'}],leaveHotel);return;}
-  run([{who:'guide',expr:'normal',text:`한 번 더 자면 체력도 더 채우고, 카드 뒤집기 미니게임으로 용돈도 벌 수 있어! 하룻밤 더 잘까? (호텔비 ${G.hotelCost}만원)`,
+  const _ex=cardAllowed()?'카드 뒤집기로 용돈도 벌 수 있어! ':'';
+  run([{who:'guide',expr:'normal',text:`한 번 더 자면 체력도 더 채우고, ${_ex}하룻밤 더 잘까? (호텔비 ${G.hotelCost}만원)`,
     choices:[{label:'한 번 더 잔다 🛏️',go:()=>doSleep(afterNight2)},{label:'이제 떠날래 ✈️',go:leaveHotel}]}]);}
-function afterNight2(){run([{who:'guide',expr:'pray',text:`이틀째 밤도 푹 잤어! 체력도 든든하게 채웠어 😊 (여기서 하는 카드 뒤집기 미니게임은 다음 단계에서 열려요 🃏)`}],leaveHotel);}
+function cardAllowed(){return G.cardPlays<3 && (G.visited.length-G.lastCardVisit)>=2;}
+function afterNight2(){if(cardAllowed())run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 이제 카드 뒤집기로 용돈을 얻어볼까? 🃏'}],cardGame);else run([{who:'guide',expr:'pray',text:'이틀째 밤도 푹 잤어! 체력도 든든하게 채웠어 😊'}],leaveHotel);}
+function cardGame(){G.phase='quiz';document.getElementById('dbar').classList.remove('on');scene('bg_minigame');document.getElementById('heroImg').style.opacity='0';
+  const vals=shuffle([20,15,10,5,-10,-15]);let flips=0,sum=0,over=false;
+  const q=document.getElementById('quiz');q.classList.add('on');
+  q.innerHTML='<div class="qpanel"><div class="qlabel">🃏 카드 <b>2장</b>을 뒤집어 용돈을 얻어보자!</div><div class="cards6" id="cardRow"></div><div class="qhint" id="cardHint">2장을 골라봐 (좋은 카드도, 아쉬운 카드도 있어)</div></div>';
+  const row=document.getElementById('cardRow');
+  vals.forEach(v=>{const c=document.createElement('button');c.className='gcard';c.textContent='?';
+    c.onclick=()=>{if(over||c.classList.contains('flip'))return;c.classList.add('flip');c.textContent=(v>=0?'+':'')+v+'만';c.classList.add(v>=0?'plus':'minus');flips++;sum+=v;
+      document.getElementById('cardHint').textContent=flips>=2?'':'한 장 더 골라봐';
+      if(flips>=2){over=true;G.cardPlays++;G.lastCardVisit=G.visited.length;
+        setTimeout(()=>{document.getElementById('quiz').classList.remove('on');G.money=Math.max(0,G.money+sum);setHUD(G.money,G.hp);
+          const msg=sum>0?`와! 카드로 용돈 ${sum}만원을 얻었어! 🎉`:(sum<0?`앗, 이번엔 ${-sum}만원을 잃었어. 다음엔 더 좋은 카드가 나올 거야!`:'딱 본전이네! 😄');
+          run([{who:'guide',expr:sum>=0?'pray':'explain',text:msg}],leaveHotel);},850);}};
+    row.appendChild(c);});}
 function leaveHotel(){transition(()=>{document.getElementById('dbar').classList.remove('on');mapview();G.phase='map';tip('👆 두 손가락으로 확대·축소! 다음 나라를 눌러봐');});}
 function endGame(){document.getElementById('dbar').classList.remove('on');const t=document.createElement('div');t.className='endmsg';t.textContent='👋 다음에 또 만나!';document.getElementById('game').appendChild(t);}
 setVB();
 // 테스트 훅
-window.__s={G,R,vocative,ticketMax,applyDisc,ff:()=>document.getElementById("sleepFF").click(),vbw:()=>vb.w,
+window.__s={G,R,vocative,ticketMax,applyDisc,ff:()=>document.getElementById("sleepFF").click(),vbw:()=>vb.w,cardAllowedTest:()=>({plays:G.cardPlays,last:G.lastCardVisit}),flipCards:()=>{const cs=document.querySelectorAll("#cardRow .gcard");cs[0].click();cs[1].click();},
  start:()=>document.getElementById('startBtn').click(),pickHero:h=>document.querySelector(`#scHero .pick[data-hero="${h}"]`).click(),
  setName:n=>{document.getElementById('nameIn').value=n;document.getElementById('nameBtn').click();},pickGuide:g=>document.querySelector(`#scGuide .pick[data-guide="${g}"]`).click(),
  advance,choose:i=>document.getElementById('choices').children[i].click(),travel:iso=>startTravel(iso),
