@@ -168,14 +168,20 @@ const gOc=el('g',{});gOc.style.pointerEvents='none';svg.appendChild(gOc);[['태�
 const gCt=el('g',{});gCt.style.pointerEvents='none';svg.appendChild(gCt);[['아시아',95,48,14],['유럽',18,52,13],['아프리카',20,3,14],['북아메리카',-100,48,13],['남아메리카',-62,-15,13],['오세아니아',134,-25,13]].forEach(([nm,lng,lat,sz])=>{const t=el('text',{x:PX(lng),y:PY(lat),class:'cont','font-size':sz});t.textContent=nm;gCt.appendChild(t);});
 const MAJOR=new Set(['jp','cn','us','gb','fr','de','it','es','ru','ca','br','au','in','eg','mx','ar','za','sa','th','vn','tr','gr','nl','se','ch','id','ph','ke','pt','no']);
 const gLbl=el('g',{});gLbl.style.pointerEvents='none';svg.appendChild(gLbl);const labelEls=[];
+const gVisit=el('g',{});gVisit.style.pointerEvents='none';svg.appendChild(gVisit);
+function updateVisitBadges(){gVisit.innerHTML='';(G.visited||[]).forEach((iso,idx)=>{const r=R[iso];if(!r)return;const x=PX(r.lng),y=PY(r.lat);
+  gVisit.appendChild(el('circle',{cx:x,cy:y,r:6,fill:'#FF5E5E',stroke:'#fff','stroke-width':1.4,'vector-effect':'non-scaling-stroke'}));
+  const t=el('text',{x:x,y:y,'text-anchor':'middle','dominant-baseline':'central',fill:'#fff','font-family':'Jua,sans-serif','font-weight':'800'});t.textContent=String(idx+1);gVisit.appendChild(t);});
+  updateBadgeScale();}
+function updateBadgeScale(){const rr=Math.max(3.4,vb.w*0.016),fs=Math.max(4,vb.w*0.013);[...gVisit.querySelectorAll('circle')].forEach(c=>c.setAttribute('r',rr));[...gVisit.querySelectorAll('text')].forEach(t=>t.setAttribute('font-size',fs));}
 DATA.roster.forEach(r=>{const t=el('text',{x:PX(r.lng),y:PY(r.lat)-(r.iso==='kr'?7:0),class:'clbl'});t.textContent=r.ko;t._mj=(r.iso==='kr')||MAJOR.has(r.iso);if(!t._mj)t.style.display='none';gLbl.appendChild(t);labelEls.push(t);});
 function updateLabels(){const fs=Math.max(3,vb.w*.013),all=vb.w<430;labelEls.forEach(t=>{t.setAttribute('font-size',fs);t.style.display=(t._mj||all)?'':'none';});}
 const trailP=el('path',{fill:'none',stroke:'rgba(224,85,63,.5)','stroke-width':2,'stroke-linecap':'round','stroke-dasharray':'7 6','vector-effect':'non-scaling-stroke'});trailP.style.display='none';trailP.style.pointerEvents='none';svg.appendChild(trailP);
 const planeG=el('g',{});planeG.style.display='none';planeG.style.pointerEvents='none';planeG.innerHTML='<path d="M15 0 C15 1.4 12 2.2 6 2.4 L2 2.4 L-2 9 L-5 9 L-3 2.4 L-8 2.4 L-11 5 L-13 5 L-11 0 L-13 -5 L-11 -5 L-8 -2.4 L-3 -2.4 L-5 -9 L-2 -9 L2 -2.4 L6 -2.4 C12 -2.2 15 -1.4 15 0 Z" fill="#E0553F" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/>';svg.appendChild(planeG);
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 let vb={x:0,y:0,w:W,h:H},target=null;
-function resetView(){const ar=(svg.clientWidth/svg.clientHeight)||0.62;let vh=280,vw=vh*ar;if(vw>W){vw=W;vh=vw/ar;}const cx=PX(127.5),cy=PY(36);vb={x:clamp(cx-vw/2,0,Math.max(0,W-vw)),y:clamp(cy-vh/2,0,Math.max(0,H-vh)),w:vw,h:vh};setVB();}
-function setVB(){svg.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);updateLabels();}
+function resetView(){const ar=(svg.clientWidth/svg.clientHeight)||0.62;let vh=280,vw=vh*ar;if(vw>W){vw=W;vh=vw/ar;}const c=G.cur||kr,cx=PX(c.lng),cy=PY(c.lat);vb={x:clamp(cx-vw/2,-vw*.15,W-vw*.85),y:clamp(cy-vh/2,-vh*.15,H-vh*.85),w:vw,h:vh};setVB();}
+function setVB(){svg.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);updateLabels();updateBadgeScale();}
 function animTo(nx,ny,nw,nh){target={x:nx,y:ny,w:nw,h:nh};requestAnimationFrame(stp);}
 function stp(){if(!target)return;let d=true;for(const k of['x','y','w','h']){vb[k]+=(target[k]-vb[k])*.22;if(Math.abs(target[k]-vb[k])>.5)d=false;}setVB();if(d){vb={...target};target=null;setVB();}else requestAnimationFrame(stp);}
 function fitBox(a,b,c,dd,pad){let x0=PX(a),x1=PX(c),y0=PY(dd),y1=PY(b);if(x1<x0){const t=x0;x0=x1;x1=t;}let w=x1-x0,h=y1-y0,cx=(x0+x1)/2,cy=(y0+y1)/2;const ar=svg.clientWidth/svg.clientHeight||2;if(w/h<ar)w=h*ar;else h=w/ar;w*=(pad||1.1);h*=(pad||1.1);animTo(cx-w/2,cy-h/2,w,h);}
@@ -230,7 +236,7 @@ nameIn.oninput=()=>{const v=nameIn.value.trim();namePv.textContent=v?`${vocative
 document.getElementById('nameBtn').onclick=()=>{G.name=nameIn.value.trim()||'친구';transition(()=>show('scGuide'));};
 document.querySelectorAll('#scGuide .pick').forEach(c=>c.onclick=()=>{G.guide=c.dataset.guide;transition(startOnboarding);});
 // 온보딩
-function startOnboarding(){show('game');scene('bg_intro');setHero('happy');G.cur=kr;G.visited=[];G.cardPlays=0;G.lastCardVisit=-99;setHUD(0,0);intro();}
+function startOnboarding(){show('game');scene('bg_intro');setHero('happy');G.cur=kr;G.visited=[];G.cardPlays=0;G.lastCardVisit=-99;updateVisitBadges();setHUD(0,0);intro();}
 function intro(){run([{who:'guide',expr:'normal',hero:'happy',text:`안녕 ${vocative(G.name)}! 나는 너의 세계 여행을 도와줄 가이드 요정, ${GN[G.guide]}이야. 지금부터 나랑 같이 세계 여행을 떠나볼까?`,choices:[{label:'그래! 🌍',go:giveMoney},{label:'아니',cls:'no',go:endGame}]}]);}
 function giveMoney(){run([{who:'guide',expr:'normal',text:'좋아! 세계 여행 결심! 먼저 너에게 1000만원의 돈을 줄게.',choices:[{label:'받는다 💰',go:coinAnim}]}]);}
 function coinAnim(){setHero('excited');let m=0;const iv=setInterval(()=>{m+=50;setHUD(Math.min(1000,m),G.hp);const c=document.createElement('div');c.className='coin-fly';c.textContent='🪙';c.style.left='50%';c.style.top='62%';document.getElementById('game').appendChild(c);requestAnimationFrame(()=>{c.style.left='70px';c.style.top='16px';c.style.opacity='0';});setTimeout(()=>c.remove(),650);if(m>=1000){clearInterval(iv);run([{who:'guide',expr:'pray',text:'우와, 1000만원이 생겼어! 정말 신나지? 😆'}],()=>{setHero('happy');explainHP();});}},60);}
@@ -256,6 +262,7 @@ function koreaFlagPick(iso){if(koreaFlagPick.d)return;koreaFlagPick.d=true;
            :{who:'guide',expr:'explain',text:'초록색 테두리가 우리나라 태극기야! 이제 알았지? 이렇게 국기를 맞히면 돼.'},
       {who:'guide',expr:'normal',text:'나라를 고르면 그 나라의 국기와 수도를 맞히는 퀴즈가 나와. 맞히면 비행기값을 할인해 주니까 잘 생각해봐!'},
       {who:'guide',expr:'explain',text:'지도는 두 손가락으로 크게·작게 볼 수 있어. 우리나라 주변부터 시작해서, 손가락으로 넓혀 세계 곳곳을 둘러봐!'},
+      {who:'guide',expr:'explain',text:'참! 호텔에서 하룻밤 더 자면(2박) \'국기 기억력 게임\'으로 용돈을 벌 수 있어. 대신 여행 내내 딱 3번만 할 수 있으니, 호텔이 싼 나라에서 하면 더 이득이야 😉'},
       {who:'guide',expr:'pray',text:'자, 가고 싶은 나라를 지도에서 골라볼까?'}
     ],()=>transition(()=>{document.getElementById('dbar').classList.remove('on');mapview();G.phase='map';tip('👆 두 손가락으로 확대·축소! 가고 싶은 나라를 눌러봐');}));},800);}
 // 여행 한 사이클
@@ -312,6 +319,7 @@ function flyTo(dest,mF,mT,hF,hT,done){const x0=PX(G.cur.lng),y0=PY(G.cur.lat),x1
 function foodLine(d){const f=FOOD[d.iso];if(f)return `${d.ko}의 대표 음식은 ${f.f}! ${f.d}`;return `${d.ko}에도 맛있는 전통 음식이 아주 많아. 여행하면서 하나씩 맛보자!`;}
 // 위키백과에서 대표 이미지 자동 취득(CORS, 무료, 키 불필요). ko→en 순서 시도, 캐시.
 const wikiCache={};
+const PERSON_RE=/(대통령|정치인|정치가|총리|국무|의원|장관|국왕|여왕|황제|왕비|왕자|공주|장군|군인|축구|야구|농구|배구|배우|가수|선수|감독|작가|화가|음악가|무용가|모델|아나운서|기업인|철학자|과학자|외교관|법조인|born|politician|president|prime minister|minister|footballer|player|actor|actress|singer|musician|artist|writer|athlete|human|person)/i;
 function wikiImage(attempts,cb){
   if(typeof fetch!=='function'){cb(null);return;}
   const key=attempts.map(a=>a.lang+':'+a.title).join('|');
@@ -319,9 +327,9 @@ function wikiImage(attempts,cb){
   let i=0;
   const go=()=>{if(i>=attempts.length){wikiCache[key]=null;cb(null);return;}
     const a=attempts[i++];if(!a.title){go();return;}
-    fetch(`https://${a.lang}.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(a.title)}&prop=pageimages&piprop=thumbnail&pithumbsize=440&format=json&redirects=1&origin=*`)
-     .then(r=>r.json()).then(d=>{let src=null;const p=d&&d.query&&d.query.pages;if(p)for(const k in p){if(p[k].thumbnail&&p[k].thumbnail.source)src=p[k].thumbnail.source;}
-       if(src){wikiCache[key]=src;cb(src);}else go();}).catch(()=>go());};
+    fetch(`https://${a.lang}.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(a.title)}&prop=pageimages|pageterms&piprop=thumbnail&pithumbsize=440&wbptterms=description&format=json&redirects=1&origin=*`)
+     .then(r=>r.json()).then(d=>{let src=null,desc='';const p=d&&d.query&&d.query.pages;if(p)for(const k in p){const pg=p[k];if(pg.thumbnail&&pg.thumbnail.source)src=pg.thumbnail.source;if(pg.terms&&pg.terms.description)desc=pg.terms.description.join(' ');}
+       if(src&&!PERSON_RE.test(desc)){wikiCache[key]=src;cb(src);}else go();}).catch(()=>go());};
   go();}
 function showPic(url,caption){const p=document.getElementById('polaroid');if(!url){p.classList.remove('on');return;}
   document.getElementById('polaroidImg').src=url;document.getElementById('polaroidCap').textContent=caption||'';p.classList.add('on');}
@@ -334,8 +342,9 @@ function showPhotos(){const ph=document.getElementById('photos'),f=FOOD[T.dest.i
 function hidePhotos(){document.getElementById('photos').classList.remove('on');}
 function capImage(d,cb){wikiImage([{lang:'ko',title:d.capKo},{lang:'en',title:d.capEn}],cb);}
 function wikiSearchImage(query,lang,cb){if(typeof fetch!=='function'||!query){cb(null);return;}const ck='S:'+lang+':'+query;if(wikiCache[ck]!==undefined){cb(wikiCache[ck]);return;}
-  fetch(`https://${lang}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=440&format=json&origin=*`)
-   .then(r=>r.json()).then(d=>{let src=null;const pg=d&&d.query&&d.query.pages;if(pg)for(const k in pg){if(pg[k].thumbnail&&pg[k].thumbnail.source)src=pg[k].thumbnail.source;}wikiCache[ck]=src;cb(src);}).catch(()=>{wikiCache[ck]=null;cb(null);});}
+  fetch(`https://${lang}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=pageimages|pageterms&piprop=thumbnail&pithumbsize=440&wbptterms=description&format=json&origin=*`)
+   .then(r=>r.json()).then(d=>{let src=null,desc='';const pg=d&&d.query&&d.query.pages;if(pg)for(const k in pg){const q=pg[k];if(q.thumbnail&&q.thumbnail.source)src=q.thumbnail.source;if(q.terms&&q.terms.description)desc=q.terms.description.join(' ');}
+     if(src&&!PERSON_RE.test(desc)){wikiCache[ck]=src;cb(src);}else{wikiCache[ck]=null;cb(null);}}).catch(()=>{wikiCache[ck]=null;cb(null);});}
 function foodImage(d,cb){const f=FOOD[d.iso];if(!f){cb(null);return;}const t=f.f.split('(')[0].trim();
   wikiImage([{lang:'ko',title:t+' (요리)'},{lang:'ko',title:t+' (음식)'},{lang:'ko',title:t}],u=>{
     if(u){cb(u);return;}
@@ -347,7 +356,7 @@ function exchangeLine(d){const w=`${d.ko}${josaEun(d.ko)}`;
   if(d.tier==='high')return `${w} 우리나라보다 물가가 높은 편이야. 그래서 호텔이 조금 비싸. 나라마다 돈의 가치가 다른 걸 '환율'이라고 해.`;
   return `${w} 우리나라와 물가가 비슷해. 그래서 호텔값도 중간이야. 나라마다 돈의 가치가 다른 걸 '환율'이라고 해.`;}
 function tierWord(t){return t==='low'?'물가가 낮아서 저렴하지!':t==='high'?'물가가 높아서 조금 비싸.':'우리나라랑 비슷한 값이야.';}
-function arrive(){G.cur=T.dest;G.visited.push(T.dest.iso);setHUD(G.money,G.hp);
+function arrive(){G.cur=T.dest;G.visited.push(T.dest.iso);updateVisitBadges();setHUD(G.money,G.hp);
   T.capUrl=null;T.foodUrl=null;capImage(T.dest,u=>{T.capUrl=u;});foodImage(T.dest,u=>{T.foodUrl=u;});const f=FOOD[T.dest.iso];
   transition(()=>{scene('bg_airport');setHero('excited');hidePic();hidePhotos();
     const lines=[
@@ -372,7 +381,7 @@ function doSleep(after){const hc=G.hotelCost;G.money=Math.max(0,G.money-hc);setH
   transition(()=>{scene('bg_hotel_day');showPhotos();sleepAnim(()=>{hidePhotos();G.hp=Math.min(100,G.hp+HP_NIGHT);setHUD(G.money,G.hp);setHero('happy');after();});});}
 function afterNight1(){run([{who:'guide',expr:'pray',text:`잘 잤어? 체력을 ${HP_NIGHT}만큼 회복했어! 지금까지 ${G.visited.length}군데를 여행했고, 남은 돈은 ${G.money}만원이야.`}],offer2nd);}
 function offer2nd(){if(G.money<G.hotelCost){run([{who:'guide',expr:'normal',text:'이제 다음 나라로 떠나볼까?'}],leaveHotel);return;}
-  const _ex=cardAllowed()?'국기 기억력 게임으로 용돈을 벌 수도, 잃을 수도 있어! ':'';
+  const _left=3-G.cardPlays;const _ex=cardAllowed()?`국기 기억력 게임으로 용돈을 벌 수도, 잃을 수도 있어! (게임은 여행 내내 총 3번, 남은 ${_left}번) `:'';
   run([{who:'guide',expr:'normal',text:`한 번 더 자면 체력도 더 채우고, ${_ex}하룻밤 더 잘까? (호텔비 ${G.hotelCost}만원)`,
     choices:[{label:'한 번 더 잔다 🛏️',go:()=>doSleep(afterNight2)},{label:'이제 떠날래 ✈️',go:leaveHotel}]}]);}
 function cardAllowed(){return G.cardPlays<3 && (G.visited.length-G.lastCardVisit)>=2;}
@@ -407,7 +416,7 @@ function leaveHotel(){transition(()=>{document.getElementById('dbar').classList.
 function endGame(){document.getElementById('dbar').classList.remove('on');const t=document.createElement('div');t.className='endmsg';t.textContent='👋 다음에 또 만나!';document.getElementById('game').appendChild(t);}
 setVB();
 // 테스트 훅
-window.__s={G,R,vocative,ticketMax,applyDisc,ff:()=>document.getElementById("sleepFF").click(),vbw:()=>vb.w,cardAllowedTest:()=>({plays:G.cardPlays,last:G.lastCardVisit}),flipCards:()=>{const cs=document.querySelectorAll("#cardRow .gcard");cs[0].click();cs[1].click();},
+window.__s={G,R,vocative,ticketMax,applyDisc,ff:()=>document.getElementById("sleepFF").click(),vbw:()=>vb.w,vbx:()=>vb.x,cardAllowedTest:()=>({plays:G.cardPlays,last:G.lastCardVisit}),flipCards:()=>{const cs=document.querySelectorAll("#cardRow .gcard");cs[0].click();cs[1].click();},
  start:()=>document.getElementById('startBtn').click(),pickHero:h=>document.querySelector(`#scHero .pick[data-hero="${h}"]`).click(),
  setName:n=>{document.getElementById('nameIn').value=n;document.getElementById('nameBtn').click();},pickGuide:g=>document.querySelector(`#scGuide .pick[data-guide="${g}"]`).click(),
  advance,choose:i=>document.getElementById('choices').children[i].click(),travel:iso=>startTravel(iso),
